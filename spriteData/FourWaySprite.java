@@ -62,7 +62,7 @@ public class FourWaySprite extends AnimSprite {
     /** Changes AnimFrames to be the given direction and reset frameCount */
     public void switchDir(Dir direction) {
         dir = direction;
-        setAnimFrames(getFrames(dir));
+        setFrameSet(getFrames(dir));
     }
 
     /** This method will:<br>
@@ -72,6 +72,39 @@ public class FourWaySprite extends AnimSprite {
     public void idleFrame() {
         resetFrameCount();
         setFrame(getFrames(dir)[0]);
+    }
+
+//SET-UP-----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * @param sprite The sprite to set up.
+     * @param pathToSheet The path to the sheet of the sprite.
+     * @param prefSize The size of the sprite pane. [width, height]
+     */
+    public static void setUpSprite(FourWaySprite sprite, String pathToSheet, int[] prefSize) {
+        setUpSprite(sprite, pathToSheet);
+        sprite.getPane().setPrefWidth(prefSize[0]);
+        sprite.getPane().setPrefHeight(prefSize[1]);
+    }
+
+    /**
+     * @param sprite The sprite to set up.
+     * @param pathToSheet The path to the sheet of the sprite.
+     */
+    public static void setUpSprite(FourWaySprite sprite, String pathToSheet) {
+
+        final WritableImage[][] ALL_FRAMES = FrameGen.genFrames(pathToSheet);
+
+        sprite.setTotalFrames(ALL_FRAMES[0].length);
+        sprite.setAllFrames(Dir.N, ALL_FRAMES[0]);
+        sprite.setAllFrames(Dir.S, ALL_FRAMES[1]);
+        sprite.setAllFrames(Dir.E, ALL_FRAMES[2]);
+        sprite.setAllFrames(Dir.W, ALL_FRAMES[3]);
+        sprite.switchDir(Dir.S);
+        sprite.idleFrame();
+
+        sprite.getPane().getChildren().add(sprite.getFrame());
+        sprite.getGroup().getChildren().add(sprite.getPane());
     }
 
 }

@@ -5,6 +5,8 @@ import javafx.collections.ObservableSet;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import worldData.WorldData;
+import worldData.objectData.SpriteTracker;
 
 public class Controller {
     public static final ObservableSet<KeyCode> mvmntKeysDown = FXCollections.observableSet();
@@ -20,10 +22,17 @@ public class Controller {
             case D:
                 mvmntKeysDown.add(key);
             break;
+            case E:
+                WorldData.triggerInteract(SpriteTracker.playerID);
+                break;
+            case I:
+                WorldData.openPicker(SpriteTracker.playerID);
+                break;
             default: return;
         }
     }
     public static void onKeyRelease(KeyCode key) {
+
         switch (key) {
 
             // Movement keys

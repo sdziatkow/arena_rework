@@ -1,6 +1,7 @@
 package spriteData.behavior.boxes;
 
-import collision.CheckBox;
+import collision.CollisionBox;
+import spriteData.Dir;
 
 /**
  * For all Sprites who have a CheckBox to check for collision against Collidables.
@@ -8,5 +9,8 @@ import collision.CheckBox;
 public interface Movable {
 
     /** @return CollisionBox Object of ColType.CHECKBOX associated with this Sprite. */
-    CheckBox getCheckBox();
+    CollisionBox getCheckBox();
+
+    Dir getDir();
+    void switchDir(Dir direction);
 }

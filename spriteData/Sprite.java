@@ -1,8 +1,6 @@
 package spriteData;
 
-import collision.ColType;
-import collision.CollisionBox;
-import javafx.scene.image.Image;
+import control.ArenaObject;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.Group;
@@ -11,14 +9,12 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.image.WritableImage;
 
 /**
- * <br>spriteSheet: Contains file with entire sprite sheet.
- * <br>spriteView:  Contains WritableImage of frame taken from spriteSheet.
- * <br>spritePane:  Can contain multiple spriteViews.
- * <br>spriteGroup: Contains spritePane and worldBox.
+ * <br>spriteView:  Contains WritableImage of this sprite's current frame. getFrame()
+ * <br>spritePane:  Can contain multiple spriteViews stacked on one another. getPane()
+ * <br>spriteGroup: Contains spritePane and any other additional elements such as CollisionBoxes.
  * <br>pos:         Property that is bound to spriteGroup's scene position.
  */
-public class Sprite {
-    private Image spriteSheet;
+public class Sprite extends ArenaObject {
     private ImageView spriteView;
     private StackPane spritePane;
 
@@ -31,7 +27,6 @@ public class Sprite {
      * Must setSpriteSheet(), setFrame(), and setPos() in order to work properly.
      */
     public Sprite() {
-        spriteSheet = null;
         spriteView = new ImageView();
         spritePane = new StackPane();
         spriteGroup = new Group();
@@ -44,28 +39,6 @@ public class Sprite {
     }
 
 //SETTERS----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Creates a new Image to store the file at the given path.
-     * @param path The path to the image file, ex: "file:resources/sprites/overworld.png"
-     */
-    public void setSheet(String path) { spriteSheet = new Image(path); }
-
-    /**
-     * This method will set the Image of ImageView spriteView.
-     * The given bounds MUST be of length 4 [x, y, width, height]
-     * The given bounds should refer to the frame's pixel location on
-     * spriteSheet.
-     */
-    public void setFrame(int[] bounds) {
-        spriteView.setImage(new WritableImage(
-                spriteSheet.getPixelReader(),
-                bounds[0],
-                bounds[1],
-                bounds[2],
-                bounds[3]
-        ));
-    }
 
     /**
      * This method will set the Image of ImageView spriteView with the given img.
@@ -83,11 +56,6 @@ public class Sprite {
     }
 
 //GETTERS----------------------------------------------------------------------------------------------------------------
-
-    /** @return The Image Object used to store the spriteSheet its frame is drawn from. */
-    public Image getSheet() {
-        return spriteSheet;
-    }
 
     /** @return The ImageView Object used to store the Sprite's current frame. */
     public ImageView getFrame() { return spriteView; }

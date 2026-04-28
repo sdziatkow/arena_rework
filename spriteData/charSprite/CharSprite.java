@@ -1,23 +1,54 @@
 package spriteData.charSprite;
 
+import collision.BoxSizer;
 import collision.ColType;
 import collision.CollisionBox;
-import javafx.scene.image.WritableImage;
-import spriteData.Dir;
-import spriteData.FrameGen;
+import movement.NPCState;
 import spriteData.MovingSprite;
 import spriteData.behavior.boxes.Collidable;
 import spriteData.behavior.boxes.Hurtable;
+import values.IntVal;
 
 import static collision.ColType.*;
 
-public abstract class CharSprite extends MovingSprite implements Collidable, Hurtable {
+public class CharSprite extends MovingSprite implements Collidable, Hurtable {
     private CollisionBox worldBox;
     private CollisionBox hurtBox;
+    private NPCState npcState;
+    public IntVal dirCount;
 
     public CharSprite() {
+        final String DEFAULT_PATH = "file:resources/sprites/character/move_4x4_16x32.png";
+        setUp(DEFAULT_PATH);
+    }
+    public CharSprite(String pathToSheet) {
+        setUp(pathToSheet);
+    }
+
+    private void setUp(String pathToSheet) {
+        dirCount = new IntVal();
+        dirCount.setMax(20);
         worldBox = new CollisionBox();
         hurtBox = new CollisionBox(HURTBOX);
+
+        setUpSprite(this, pathToSheet, new int[]{32, 32});
+        BoxSizer.sizeBoxSmallMid(pathToSheet, worldBox);
+        getGroup().getChildren().add(getWorldBox().getColBox());
+
+        BoxSizer.sizeBoxBigMid(pathToSheet, hurtBox);
+        getGroup().getChildren().add(hurtBox.getColBox());
+
+        getCheckBox().setBaseBounds(worldBox.getBaseBounds());
+        getCheckBox().contract();
+        getGroup().getChildren().add(getCheckBox().getColBox());
+//        setUpBoxes(this, null);
+    }
+
+    @Override
+    public void setID(Integer ID) {
+        super.setID(ID);
+        worldBox.setID(ID);
+        hurtBox.setID(ID);
     }
 
     @Override
@@ -30,40 +61,16 @@ public abstract class CharSprite extends MovingSprite implements Collidable, Hur
         return hurtBox;
     }
 
-    public static void setUpSprite(CharSprite sprite, String pathToSheet) {
-        final int TOTAL_FRAMES = 4; // For each individual animation.
-        final int TOTAL_DIRECTIONS = 4; // Total animations. 1 per direction. 4 Total directions.
-
-        sprite.setSheet(pathToSheet);
-        sprite.setTotalFrames(TOTAL_FRAMES);
-
-        final WritableImage[][] ALL_FRAMES = FrameGen.genFrames( // Generate frames from spriteSheet.
-                TOTAL_DIRECTIONS, TOTAL_FRAMES,
-                sprite.getSheet(),
-                0, 0, 16, 32
-        );
-
-        sprite.setAllFrames(Dir.N, ALL_FRAMES[0]);
-        sprite.setAllFrames(Dir.S, ALL_FRAMES[1]);
-        sprite.setAllFrames(Dir.E, ALL_FRAMES[2]);
-        sprite.setAllFrames(Dir.W, ALL_FRAMES[3]);
-        sprite.switchDir(Dir.S);
-        sprite.idleFrame();
-
-        sprite.getPane().getChildren().add(sprite.getFrame());
-        sprite.getPane().setPrefHeight(32);
-        sprite.getPane().setPrefWidth(32);
-        sprite.getGroup().getChildren().add(sprite.getPane());
-    }
+    public NPCState getNPCState() { return npcState; }
+    public void setNPCState(NPCState s) { npcState = s; }
 
     /**
      * Will set the bounds of boxes of given types and add them to this Sprite's Group.
      * @param types If given null, will set up WORLDBOX, CHECKBOX, and HURTBOX by default.
      */
     public static void setUpBoxes(CharSprite sprite, ColType[] types) {
-        final double[] WORLD_BOX_BOUNDS = new double[]{8.0, 8.0, 16.0, 20.0};
-        final double[] CHECK_BOX_BOUNDS = new double[]{12.0, 12.0, 10.0, 12.0};
-        final double[] HURT_BOX_BOUNDS = new double[]{11.5, 12.0, 10.0, 12.0};
+        final double[] WORLD_BOX_BOUNDS = new double[]{12.5, 12.5, 6.0, 8.0};
+        final double[] CHECK_BOX_BOUNDS = new double[]{10.0, 10.0, 12.0, 14.0};
 
         if (types == null) types = new ColType[]{WORLDBOX, CHECKBOX, HURTBOX};
 
@@ -74,12 +81,12 @@ public abstract class CharSprite extends MovingSprite implements Collidable, Hur
                     sprite.getGroup().getChildren().add(sprite.getWorldBox().getColBox());
                     break;
                 case CHECKBOX:
-                    sprite.getCheckBox().setBaseBounds(CHECK_BOX_BOUNDS);
+                    sprite.getCheckBox().setBaseBounds(WORLD_BOX_BOUNDS);
                     sprite.getCheckBox().contract();
                     sprite.getGroup().getChildren().add(sprite.getCheckBox().getColBox());
                     break;
                 case HURTBOX:
-                    sprite.getHurtBox().setBounds(HURT_BOX_BOUNDS);
+                    sprite.getHurtBox().setBounds(WORLD_BOX_BOUNDS);
                     sprite.getGroup().getChildren().add(sprite.getHurtBox().getColBox());
                     break;
                 default:

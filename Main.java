@@ -1,38 +1,44 @@
-import collision.ColChecker;
 import control.Controller;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-import movement.MvState;
-import movement.PlayerMvmnt;
-import spriteData.backgroundSprite.TowerSprite;
-import spriteData.behavior.boxes.Collidable;
-import spriteData.charSprite.CharSprite16x32;
-import spriteData.charSprite.CombatSprite32x32;
-
-import java.util.ArrayList;
+import menus.Menus;
+import movement.CharMvmnt;
+import worldData.WorldData;
+import worldData.objectData.SpriteTracker;
+import worldData.statData.StatTracker;
+import worldStage.WorldStage;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static worldData.WorldData.cam;
 
 public class Main extends Application {
 
     /** Runs before start **/
     public void init() {
+        WorldStage world = new WorldStage();
+        WorldData.bg = world.getWorld();
+        WorldData.bg.getChildren().add(Menus.overlay);
+        WorldData.bg.setCache(true);
     }
 
     @Override
-    public void start(Stage s) {
-        s = new Stage();
+    public void start(Stage stage) {
+        final Stage s = stage;
+        Scene sc = new Scene(WorldData.bg, 3000, 3000, true);
+        sc.setCamera(cam);
+        Menus.overlay.getChildren().add(cam);
+        Menus.overlay.setCache(true); // Must have this or else will not render correctly.
+        CharMvmnt.bindNode(SpriteTracker.charSprites.get(SpriteTracker.playerID), Menus.overlay);
 
-        CombatSprite32x32 player = new CombatSprite32x32();
-        TowerSprite tower = new TowerSprite();
-
-        s.setScene(new Scene(new Group(tower.getGroup(), player.getGroup()), 3000, 3000, true));
+        s.setScene(sc);
         s.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
                 @Override
                 public void handle(KeyEvent keyEvent) { Controller.onKeyDown(keyEvent.getCode());}
@@ -52,36 +58,40 @@ public class Main extends Application {
             public void handle(MouseEvent mouseEvent) {Controller.onMouseBtnReleased(mouseEvent);}
         });
 
+        s.widthProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                Menus.overlay.setLayoutX(-s.getWidth() / 2.25);
+                Menus.overlay.setLayoutY(-s.getHeight() / 2.25);
+            }
+        });
+        s.heightProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                Menus.overlay.setLayoutX(-s.getWidth() / 2.25);
+                Menus.overlay.setLayoutY(-s.getHeight() / 2.25);
+            }
+        });
+
         s.setTitle("WASTE");
         s.setWidth(500.0);
         s.setHeight(500.0);
         s.show();
 
     //TESTING------------------------------------------------------------------------------------------------------------
-        ArrayList<Collidable> allSprites = new ArrayList<>();
-        allSprites.add(tower);
-        allSprites.add(player);
 
-        tower.setPos(100, 100);
-
-        PlayerMvmnt.setSprite(player);
-        PlayerMvmnt.cntrlSetUp();
-
-        player.getSpeed().setMax(1.7);
+        SpriteTracker.combatSprites.get(SpriteTracker.playerID).getSpeed().setMax(1.7);
+        StatTracker.gameChars.get(SpriteTracker.playerID).lvl().incAttrPoints();
 
         Timer gameTimer = new Timer();
         gameTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if (ColChecker.isColliding(player, allSprites)) {
-                    PlayerMvmnt.forceState(MvState.STOPPED);
-                }
-                else {
-                    PlayerMvmnt.runMvmnt();
-                }
+                Platform.runLater(() -> {
+                    WorldData.runMvmnt();
+                });
             }
         }, 0, 32);
-
     }
 
     public static void main(String[] args) {

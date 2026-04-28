@@ -1,0 +1,56 @@
+.stat-main {
+    -fx-min-width: 250px;
+    -fx-min-height: 225px;
+    -fx-alignment: top-center;
+    -fx-background-color: rosybrown;
+    -fx-border-width: 1 1 1 1;
+    -fx-border-color: saddlebrown;
+}
+.stat-header {
+    -fx-min-width: 250px;
+    -fx-min-height: 50px;
+    -fx-font-size: 18px;
+    -fx-alignment: center;
+    -fx-text-fill: darkslategray;
+    -fx-text-weight: bold;
+}
+
+.stat-grid {
+    -fx-min-width: 200px;
+    -fx-min-height: 100px;
+    -fx-hgap: 8px;
+    -fx-vgap: 5px;
+    -fx-alignment: center-right;
+}
+.stat-key-label {
+    -fx-min-width: 35px;
+    -fx-min-height: 25px;
+    -fx-alignment: center;
+    -fx-text-fill: linen;
+    -fx-border-width: 0 1 1 0;
+    -fx-border-color: darkslategray;
+}
+.stat-div-label {
+    -fx-min-width: 10px;
+    -fx-min-height: 20px;
+    -fx-alignment: center;
+    -fx-hgap: 0px;
+    -fx-text-fill: black;
+}
+.stat-val-label {
+    -fx-min-width: 30px;
+    -fx-min-height: 20px;
+    -fx-alignment: center-right;
+    -fx-text-fill: oldlace;
+}
+.stat-max-label {
+    -fx-min-width: 50px;
+    -fx-min-height: 20px;
+    -fx-alignment: center-left;
+    -fx-text-fill: linen;
+}
+
+.HP {}
+.SP {}
+.DEF {}
+.SPEED {}

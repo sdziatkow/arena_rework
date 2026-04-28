@@ -1,0 +1,46 @@
+.char-main {
+    -fx-min-width: 250px;
+    -fx-min-height: 225px;
+    -fx-alignment: top-center;
+    -fx-background-color: rosybrown;
+    -fx-border-width: 1 1 1 1;
+    -fx-border-color: saddlebrown;
+}
+.char-header {
+    -fx-min-width: 200px;
+    -fx-min-height: 25px;
+    -fx-font-size: 18px;
+    -fx-alignment: center;
+    -fx-text-fill: darkslategray;
+}
+
+.char-grid {
+    -fx-min-width: 200px;
+    -fx-min-height: 150px;
+    -fx-hgap: 5px;
+    -fx-vgap: 10px;
+    -fx-alignment: center;
+}
+.char-key-label {
+    -fx-min-width: 50px;
+    -fx-min-height: 20px;
+    -fx-alignment: center-right;
+    -fx-text-fill: linen;
+    -fx-padding: 0 4 0 0;
+    -fx-border-width: 0 1 1 0;
+    -fx-border-color: darkslategray;
+}
+.char-val-label {
+    -fx-min-width: 50px;
+    -fx-min-height: 20px;
+    -fx-alignment: center;
+    -fx-text-fill: linen;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: darkslategray;
+    -fx-border-padding: 0 0 0 1;
+}
+
+.NAME {}
+.CLASS {}
+.LEVEL {}
+.TO-NEXT {}

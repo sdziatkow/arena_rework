@@ -1,7 +1,10 @@
 package spriteData;
 
-import collision.CheckBox;
+import collision.ColType;
+import collision.CollisionBox;
 import javafx.animation.Animation;
+import movement.MvState;
+import movement.NPCState;
 import spriteData.behavior.boxes.Movable;
 import values.DoubleVal;
 
@@ -13,16 +16,23 @@ import values.DoubleVal;
  * @see Dir
  */
 public class MovingSprite extends FourWaySprite implements Movable {
-    private CheckBox checkBox;
+    private CollisionBox checkBox;
     private DoubleVal speed;
+    private MvState mvState;
 
     public MovingSprite() {
         getAnim().setCycleCount(Animation.INDEFINITE);
-        checkBox = new CheckBox();
+        checkBox = new CollisionBox(ColType.CHECKBOX);
         speed = new DoubleVal();
     }
 
 //SETTERS----------------------------------------------------------------------------------------------------------------
+
+    @Override
+    public void setID(Integer ID) {
+        super.setID(ID);
+        checkBox.setID(ID);
+    }
 
     /**
      * Overridden so that cycle count remains indefinite.
@@ -37,13 +47,17 @@ public class MovingSprite extends FourWaySprite implements Movable {
     /** @param maxRate The maximum move rate of this Sprite. */
     public void setMaxSpeed(double maxRate) { speed.setMax(maxRate); }
 
+    public void setMvState(MvState state) { mvState = state; }
+
 //GETTERS----------------------------------------------------------------------------------------------------------------
 
-    /** @see CheckBox */
-    public CheckBox getCheckBox(){ return checkBox; }
+    /** @see CollisionBox */
+    public CollisionBox getCheckBox(){ return checkBox; }
 
     /** @see values.DoubleVal */
     public DoubleVal getSpeed() { return speed; }
+
+    public MvState getMvState() { return mvState; }
 
 //FLAGS------------------------------------------------------------------------------------------------------------------
 

@@ -1,0 +1,62 @@
+.attr-main {
+    -fx-min-width: 275px;
+    -fx-min-height: 275px;
+    -fx-background-color: rosybrown;
+    -fx-alignment: top-center;
+    -fx-border-width: 1 1 1 1;
+    -fx-border-color: saddlebrown;
+}
+.attr-header {
+    -fx-min-width: 200px;
+    -fx-min-height: 50px;
+    -fx-font-size: 18px;
+    -fx-alignment: center;
+    -fx-text-fill: darkslategray;
+    -fx-text-weight: bold;
+}
+
+.attr-grid {
+    -fx-min-width: 200px;
+    -fx-min-height: 150px;
+    -fx-hgap: 10px;
+    -fx-vgap: 5px;
+}
+
+.attr-label {
+    -fx-min-width: 100px;
+    -fx-min-height: 30px;
+    -fx-alignment: center;
+    -fx-text-fill: linen;
+    -fx-border-width: 0 1 1 0;
+    -fx-border-color: darkslategray;
+}
+
+.attr-key-label {}
+.attr-val-label {
+}
+
+.attr-btn-grid {
+    -fx-min-height: 200px;
+    -fx-hgap: 5px;
+    -fx-vgap: 5px;
+    -fx-alignment: top-center;
+}
+.attr-btn {
+    -fx-background-insets: 4 4 4 4;
+    -fx-alignment: center;
+    -fx-font-weight: bold;
+    -fx-background-color: linen;
+}
+.attr-plus {
+    -fx-text-fill: green;
+}
+.attr-minus {
+    -fx-text-fill: red;
+}
+
+.VIGOR {}
+.ENDURANCE {}
+.WILLPOWER {}
+.STRENGTH {}
+.AGILITY {}
+.DEXTERITY {}

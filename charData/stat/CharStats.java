@@ -1,8 +1,17 @@
-package charData;
+package charData.stat;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import values.DoubleVal;
 
+import charData.attr.Attr;
+import values.DoubleVal;
+import values.IntVal;
+
+/** A representation of a game character's Stats and their values.
+ * Default values are defined in enum Stat
+ * @see Stat
+ * @see DoubleVal
+ */
 public class CharStats {
     private final HashMap<Stat, DoubleVal> ALL_STATS;
 

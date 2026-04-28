@@ -1,74 +1,30 @@
 package charData;
+import control.ArenaObject;
 
-public class CharData {
-    private CharAttr attr;
-    private CharStats stats;
-    private Level lvl;
-    private CharClass charClass;
+public abstract class CharData extends ArenaObject {
+
+    private String pathToMvSheet;
+    private String pathToAttkSheet;
+    private String name;
 
     public CharData() {
-        attr = new CharAttr();
-        stats = new CharStats();
-        lvl = new Level();
-        charClass = CharClass.BARBARIAN;
-        setInitialAttrValues();
+        pathToMvSheet = "file:resources/sprites/character/move_4x4_16x32.png";
+        pathToAttkSheet = "file:resources/sprites/character/attk_4x4_32x32.png";
+        name = "ERROR:NOT-SET";
     }
 
-    public CharData(CharClass c) {
-        attr = new CharAttr();
-        stats = new CharStats();
-        lvl = new Level();
-        charClass = c;
-        setInitialAttrValues();
+    public CharData(String mvSheet, String attkSheet, String n) {
+        pathToMvSheet = mvSheet;
+        pathToAttkSheet = attkSheet;
+        name = n;
     }
 
-    public CharAttr attr() {
-        return attr;
-    }
-    public CharStats stats() {
-        return stats;
-    }
-    public Level lvl() {
-        return lvl;
-    }
-    public CharClass getCharClass() {
-        return charClass;
-    }
+    public void setPathToMvSheet(String n) { pathToMvSheet = n; }
+    public void setPathToAttkSheet(String n) { pathToAttkSheet = n; }
+    public void setName(String n) { name = n; }
 
-    /** SHOULD ONLY BE CALLED ONCE. (for gameplay reasons). */
-    private void setInitialAttrValues() {
-        switch (charClass) {
-            case BARBARIAN:
-                attr.get(Attr.VIGOR).inc(10);
-                attr.get(Attr.ENDURANCE).inc(10);
-                attr.get(Attr.STRENGTH).inc(10);
-                break;
-            case BRUTE:
-                attr.get(Attr.ENDURANCE).inc(10);
-                attr.get(Attr.WILLPOWER).inc(10);
-                attr.get(Attr.STRENGTH).inc(10);
-                break;
-            case DRIFTER:
-                attr.get(Attr.AGILITY).inc(10);
-                attr.get(Attr.ENDURANCE).inc(10);
-                attr.get(Attr.WILLPOWER).inc(10);
-                break;
-            case RANGER:
-                attr.get(Attr.AGILITY).inc(10);
-                attr.get(Attr.DEXTERITY).inc(10);
-                attr.get(Attr.ENDURANCE).inc(10);
-                break;
-            case SCOUT:
-                attr.get(Attr.VIGOR).inc(10);
-                attr.get(Attr.AGILITY).inc(10);
-                attr.get(Attr.ENDURANCE).inc(10);
-                break;
-            case MONK:
-                attr.get(Attr.VIGOR).inc(10);
-                attr.get(Attr.WILLPOWER).inc(10);
-                attr.get(Attr.AGILITY).inc(10);
-                break;
-        }
-    }
+    public String getPathToMvSheet() { return pathToMvSheet; }
+    public String getPathToAttkSheet() { return pathToAttkSheet; }
+    public String getName() { return name; }
 
 }

@@ -29,6 +29,8 @@ public class IntVal {
         max = v;
     }
 
+    /** Set this value to its minimum value. */
+    public void reset(){set(min);}
     public void set(int v) {
         if (v < min) val = min;
         else val = Math.min(v, max); // If v is greater than max, set val to max.

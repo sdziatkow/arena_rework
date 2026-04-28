@@ -10,6 +10,7 @@ import javafx.util.Duration;
 import values.IntVal;
 
 /** Animated Sprite
+ * For animations with one set of frames.
  * @see Sprite
  */
 public class AnimSprite extends Sprite {
@@ -17,7 +18,7 @@ public class AnimSprite extends Sprite {
     public final int BASE_FRAME_RATE = 128;
 
     private IntVal frameCount;
-    private WritableImage[] animFrames;
+    private WritableImage[] frameSet;
 
     private Timeline anim;
     private KeyFrame animEvent;
@@ -28,7 +29,7 @@ public class AnimSprite extends Sprite {
     /** Creates an empty AnimSprite by default has 1 total frame */
     public AnimSprite() {
         frameCount = new IntVal();
-        animFrames = new WritableImage[frameCount.getMax()];
+        frameSet = new WritableImage[frameCount.getMax()];
 
         // Switch to next frame when frame is finished.
         onAnimFrameFinish = new EventHandler<ActionEvent>() {
@@ -44,7 +45,7 @@ public class AnimSprite extends Sprite {
     /** @param totalFrames The total amount of frames that this Sprite's animation has. */
     public AnimSprite(int totalFrames) {
         frameCount = new IntVal();
-        animFrames = new WritableImage[frameCount.getMax()];
+        frameSet = new WritableImage[frameCount.getMax()];
 
         // Switch to next frame when frame is finished.
         onAnimFrameFinish = new EventHandler<ActionEvent>() {
@@ -59,6 +60,10 @@ public class AnimSprite extends Sprite {
 
 //SETTERS----------------------------------------------------------------------------------------------------------------
 
+    public void setAnimEvent(KeyFrame event) {
+        animEvent = event;
+    }
+
     /**
      * This method will set totalFrames to given frames and re-initialize
      * allFrames and anim.cycleCount because they are dependent on
@@ -67,29 +72,12 @@ public class AnimSprite extends Sprite {
      */
     public void setTotalFrames(int frames) {
         frameCount.setMax(frames);
-        animFrames = new WritableImage[getTotalFrames()];
+        frameSet = new WritableImage[getTotalFrames()];
         anim.setCycleCount(getTotalFrames());
     }
 
-    /**
-     * The given 2D array bounds should be length equal to getTotalFrames and
-     * each sub-array should be length 4 [x, y, width, height].
-     */
-    public void setAnimFrames(int[][] bounds) {
-
-        for (int i = 0; i < getTotalFrames(); ++i) {
-            animFrames[i] = new WritableImage(
-                    getSheet().getPixelReader(),
-                    bounds[i][0],
-                    bounds[i][1],
-                    bounds[i][2],
-                    bounds[i][3]
-            );
-        }
-    }
-
     /** Sets all frames of this Sprite's animation to the given frames. */
-    public void setAnimFrames(WritableImage[] frames) { animFrames = frames; }
+    public void setFrameSet(WritableImage[] frameSet) { this.frameSet = frameSet; }
 
 //GETTERS----------------------------------------------------------------------------------------------------------------
 
@@ -100,7 +88,7 @@ public class AnimSprite extends Sprite {
     public int getTotalFrames() { return frameCount.getMax(); }
 
     /** @return An array containing each frame of this AnimSprite's animation */
-    public WritableImage[] getAnimFrames() { return animFrames; }
+    public WritableImage[] getFrameSet() { return frameSet; }
 
     /** @return A Timeline describing this AnimSprite's animation. */
     public Timeline getAnim() { return anim; }
@@ -116,7 +104,7 @@ public class AnimSprite extends Sprite {
      * 	Set the sprite frame to animFrame at index frameCount.
      */
     public void nextFrame() {
-        setFrame(getAnimFrames()[frameCount.get()]);
+        setFrame(getFrameSet()[frameCount.get()]);
         if (isLastFrame()) resetFrameCount();
         else frameCount.inc(1);
     }
@@ -127,9 +115,9 @@ public class AnimSprite extends Sprite {
 
         reversed = new WritableImage[getTotalFrames()];
         for (int f = 0; f < getTotalFrames(); ++f) {
-            reversed[f] = animFrames[(getTotalFrames() - 1) - f];
+            reversed[f] = frameSet[(getTotalFrames() - 1) - f];
         }
-        animFrames = reversed;
+        frameSet = reversed;
     }
 
     public void resetFrameCount() { frameCount.set(frameCount.getMin()); }

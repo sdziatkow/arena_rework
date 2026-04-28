@@ -28,16 +28,16 @@ public class DoubleVal {
         max = v;
     }
 
+    /** Set this value to its minimum value. */
+    public void reset(){set(min);}
     public void set(double v) {
         if (v < min) val = min;
         else val = Math.min(v, max);
     }
-    public void inc(double amnt) {
-        set(val + amnt);
-    }
-    public void dec(double amnt) {
-        set(val - amnt);
-    }
+    public void inc()         { set(val + 1.0);    }
+    public void inc(double amnt) { set(val + amnt); }
+    public void dec()         { set(val - 1.0);    }
+    public void dec(double amnt) { set(val - amnt); }
 
     public double getMin() {return min;}
     public double getMax() {return max;}

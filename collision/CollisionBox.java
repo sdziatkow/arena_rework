@@ -3,11 +3,16 @@ package collision;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
 import javafx.geometry.Bounds;
+import spriteData.Dir;
+
+import java.util.Objects;
 
 public class CollisionBox {
 
+    private int id;
     private ColType type;
     private Rectangle colBox;
+    private double[] baseBounds;
 
 //CONSTRUCTORS-----------------------------------------------------------------------------------------------------------
 
@@ -85,6 +90,19 @@ public class CollisionBox {
 //SETTERS----------------------------------------------------------------------------------------------------------------
 
     /**
+     * 3 cases:
+     *      <br> case 1: This will be used within a Group for a SpriteData object.
+     *      <br>         This should be set to the SpriteData Object's getID().
+     *      <br> case 3: Any other case
+     *      <br>         Not implemented a stage background with dirt walls etc but will eventually need standAlone box.
+     *      <br>         Otherwise set it to its SpriteData's getID()
+     * @param x The ID of this object.
+     */
+    public void setID(int x) {
+        id = x;
+    }
+
+    /**
      * Sets the size of the rectangle
      * @param bounds The size of the CollisionBox; Array must be of length 4 exactly: [west, north, width, height].
      */
@@ -99,6 +117,10 @@ public class CollisionBox {
     }
 
 //GETTERS----------------------------------------------------------------------------------------------------------------
+
+    public int getID() {
+        return id;
+    }
 
     /** @return The type of collision this box checks for. */
     public ColType getColType() { return type; }
@@ -126,4 +148,58 @@ public class CollisionBox {
 
     /** Will return a Bounds object of rectangle. */
     public Bounds getBounds() { return colBox.localToScene(colBox.getBoundsInLocal()); }
+
+//OPERATIONS-------------------------------------------------------------------------------------------------------------
+
+    /**
+     * This sets the base bounds of CheckBox. These are the bounds CheckBox will contract() to.
+     * Allows for expanding while still being able to go back to original bounds.
+     * @param bounds Must be exactly of length four. [x, y, width, height]
+     */
+    public void setBaseBounds(double[] bounds) {
+        if (bounds.length != 4) throw new IllegalArgumentException("Array must be length of exactly 4.");
+        baseBounds = bounds;
+    }
+
+    /** @return The base bounds of this CheckBox; The bounds this CheckBox will contract() to */
+    public double[] getBaseBounds() { return baseBounds; };
+
+    /** Set the bounds of this CheckBox to its base bounds */
+    public void contract() { setBounds(baseBounds); }
+
+    /**
+     * Moves the bounds of this CollisionBox by the given amount in the given direction
+     * @param amnt The amount to move the box by in the given direction, should be the sprite's max speed.
+     * @param direction The direction in which to expand.
+     */
+    public void checkDir(double amnt, Dir direction) {
+        contract();
+
+        // North or south.
+        if (direction.equals(Dir.N) || direction.equals(Dir.S)) {
+            getColBox().setHeight(baseBounds[3] / 3.0); // Shrink height.
+            if (direction.equals(Dir.N)) getColBox().setY(baseBounds[1] - amnt); // From top-most point minus amnt.
+            else getColBox().setY(baseBounds[1] + (baseBounds[3] / 1.5) + amnt); // From bottom-most point plus amnt.
+        }
+
+        // East or West.
+        else if (direction.equals(Dir.E) || direction.equals(Dir.W)) {
+            getColBox().setWidth(baseBounds[2] / 3.0); // Shrink width.
+
+            // From right-most point plus amnt.
+            if (direction.equals(Dir.E)) getColBox().setX(baseBounds[0] + (baseBounds[2] / 1.5) + amnt);
+            else getColBox().setX(baseBounds[0] - amnt); // From left-most point minus amnt.
+        }
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof CollisionBox box)) return false;
+        return this.id == box.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(String.valueOf(id));
+    }
 }

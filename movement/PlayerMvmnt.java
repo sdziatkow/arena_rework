@@ -6,22 +6,21 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import spriteData.Dir;
 import spriteData.MovingSprite;
-import spriteData.charSprite.CombatSprite32x32;
-import values.DoubleVal;
+import spriteData.charSprite.CharSprite;
+import spriteData.charSprite.CombatSprite;
 
 /**
- *
  * @see MovingSprite For more information on where the sprite's speed field is coming from.
  */
-public class PlayerMvmnt {
-    private static CombatSprite32x32 sprite = null;
-    public static double acceleration = 0.24;
-    public static double friction = 0.12;
+public class PlayerMvmnt extends CharMvmnt {
+    private static CombatSprite sprite = null;
     private static MvState state = null;
 
-    public static void setSprite(CombatSprite32x32 s) {
+    public static void setSprite(CombatSprite s) {
         sprite = s;
-        if (sprite != null) state = sprite.state();
+        if (sprite != null) {
+            state = sprite.getMvState();
+        }
     }
 
     private static void setState() {
@@ -44,18 +43,13 @@ public class PlayerMvmnt {
     private static void move() {
         switch (state) {
             case MOVING:
-                accel(sprite.getSpeed());
-                if (!sprite.isAnimRunning()) sprite.getAnim().play(); // Play animation if it is not playing.
-                translate();
-                slow(sprite.getSpeed());
+                onMove(sprite);
                 break;
             case SLOWING:
-                translate();
-                hardSlow(sprite.getSpeed());
+                onSlowing(sprite);
                 break;
             case STOPPED:
-                sprite.idleFrame(); // Switch to idle frame
-                if (sprite.isAnimRunning()) sprite.getAnim().pause(); // Pause animation if not paused.
+                onStopped(sprite);
                 break;
             case ATTACK:
                 if (sprite.isAnimRunning()) sprite.getAnim().pause(); // Pause animation if not paused.
@@ -64,35 +58,6 @@ public class PlayerMvmnt {
             default: return;
         }
     }
-
-    public static void translate() {
-        double[] currPos = new double[]{sprite.getPos(0).doubleValue(), sprite.getPos(1).doubleValue()};
-        double[] nextPos = nextPos(sprite.getSpeed(), sprite.getDir(), currPos);
-        sprite.setPos(nextPos[0], nextPos[1]);
-    }
-    private static double[] nextPos(DoubleVal speed, Dir direction, double[] currPos) {
-        switch (direction) {
-            case N:
-                currPos[1] -= speed.get();
-                break;
-            case S:
-                currPos[1] += speed.get();
-                break;
-            case E:
-                currPos[0] += speed.get();
-                break;
-            case W:
-                currPos[0] -= speed.get();
-                break;
-            default: return currPos;
-        }
-        return currPos;
-    }
-
-    private static void accel(DoubleVal speed) { speed.inc(acceleration); }
-    private static void slow(DoubleVal speed) { speed.dec(friction); }
-    private static void hardSlow(DoubleVal speed) {speed.dec(friction * 2.7);}
-    private static void halt(DoubleVal speed) { speed.set(speed.getMin()); }
 
     public static void cntrlSetUp() {
         Controller.mvmntKeysDown.addListener(new SetChangeListener<KeyCode>() {
@@ -130,7 +95,7 @@ public class PlayerMvmnt {
                     else if (a) sprite.switchDir(Dir.W);
                 }
 
-                sprite.getCheckBox().expand(sprite.getSpeed().getMax() * 2, sprite.getDir());
+                sprite.getCheckBox().checkDir(sprite.getSpeed().getMax() * 2, sprite.getDir());
             }
         });
 

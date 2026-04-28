@@ -1,4 +1,4 @@
-package charData;
+package charData.attr;
 
 /**
  * VIGOR - HP

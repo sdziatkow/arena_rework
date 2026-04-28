@@ -1,5 +1,11 @@
-package charData;
+package charData.stat;
 
+/** Defines all Stats for a game character.
+ * HP  - Health  (Points)
+ * SP  - Stamina (Points)
+ * DEF - Defense
+ * SPD - Speed
+ */
 public enum Stat {
     HP, SP, DEF, SPEED;
 
@@ -7,7 +13,7 @@ public enum Stat {
         return HP.getDeclaringClass().getEnumConstants();
     }
 
-    /**
+    /** Defines the default values for all stats.
      * @return double array with length of three. [min, max, val]
      */
     public static double[] getDefaultVals(Stat s) {

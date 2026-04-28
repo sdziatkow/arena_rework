@@ -1,8 +1,14 @@
-package charData;
+package charData.attr;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import values.IntVal;
 
+/** A representation of a game character's Attributes and their values.
+ * Default values are: min: 0; max: 100
+ * @see Attr
+ * @see IntVal
+ */
 public class CharAttr {
     private final HashMap<Attr, IntVal> ALL_ATTR;
 

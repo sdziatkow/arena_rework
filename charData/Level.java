@@ -1,13 +1,18 @@
 package charData;
 
-import values.DoubleVal;
+import charData.attr.Attr;
 import values.IntVal;
 
+/** A representation of a game character's Level and its values.
+ * @see Attr
+ * @see IntVal
+ */
 public class Level {
     private final double DEFAULT_TO_NEXT = 100;
     private double xp;
     private double toNext;
     private int lvl;
+    private int attrPoints;
 
     public Level() {
         xp = 0.0;
@@ -25,6 +30,8 @@ public class Level {
 
     /** @return Integer value describing the level */
     public int getLvl() { return lvl; }
+
+    public int getAttrPoints() {return attrPoints;}
 
 //OPERATIONS-------------------------------------------------------------------------------------------------------------
 
@@ -51,11 +58,15 @@ public class Level {
         lvl = val;
     }
 
+    public void incAttrPoints() {++attrPoints;}
+    public void decAttrPoints() {--attrPoints;}
+
     /** @return true if current xp is greater than or equal to the required amount to level up. */
     public boolean canLvlUp() { return (xp >= toNext); }
     public void lvlUp() {
         xp -= toNext;
         ++lvl;
+        ++attrPoints;
         toNext = (DEFAULT_TO_NEXT + toNext) * 1.13;
     }
 
