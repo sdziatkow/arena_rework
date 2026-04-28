@@ -36,6 +36,8 @@ public class Sprite extends ArenaObject {
         spriteGroup.translateXProperty().bind(pos[0]);
         spriteGroup.translateYProperty().bind(pos[1]);
         spriteGroup.setCache(true);
+        spriteView.setCache(true);
+        spritePane.setCache(true);
     }
 
 //SETTERS----------------------------------------------------------------------------------------------------------------

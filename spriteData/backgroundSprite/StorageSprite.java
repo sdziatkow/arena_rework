@@ -6,14 +6,17 @@ import collision.CollisionBox;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.image.WritableImage;
+import menus.Menus;
 import spriteData.AnimSprite;
 import spriteData.FrameGen;
 import spriteData.behavior.boxes.Collidable;
 import spriteData.behavior.boxes.Interactable;
+import worldData.WorldData;
 
 public class StorageSprite extends AnimSprite implements Collidable, Interactable {
     private CollisionBox worldBox;
     private CollisionBox interactBox;
+    private boolean isOpen;
 
     public StorageSprite() {
         final String DEFAULT_PATH = "file:resources/sprites/bg_sprites/chest/open_1x3_20x20.png";
@@ -47,6 +50,7 @@ public class StorageSprite extends AnimSprite implements Collidable, Interactabl
 
         getGroup().getChildren().add(worldBox.getColBox());
         getGroup().getChildren().add(interactBox.getColBox());
+        isOpen = false;
     }
 
     @Override
@@ -67,7 +71,13 @@ public class StorageSprite extends AnimSprite implements Collidable, Interactabl
 
     @Override
     public void onInteract(int interactorID) {
-        if (!isAnimRunning()) getAnim().play();
+        if (!isAnimRunning()) {
+            getAnim().play();
+            isOpen = !isOpen;
+        }
+        if (isOpen) {
+            WorldData.openStorageInteraction(interactorID, getID());
+        } else Menus.clearMenus();
 
     }
 }

@@ -83,4 +83,9 @@ public class WorldData {
     public static void openPicker(int gameCharID) {
         Menus.dispPicker(StatTracker.gameChars.get(gameCharID), StorageTracker.storages.get(gameCharID));
     }
+    
+    public static void openStorageInteraction(int interactorID, int interactableID) {
+        Menus.dispStorageInteraction(
+                StorageTracker.storages.get(interactorID), StorageTracker.storages.get(interactableID));
+    }
 }
