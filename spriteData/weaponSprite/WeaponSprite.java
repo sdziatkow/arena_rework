@@ -1,17 +1,13 @@
 package spriteData.weaponSprite;
 
-import collision.ColType;
+import static collision.ColType.HITBOX;
 import collision.CollisionBox;
-import control.ArenaObject;
 import spriteData.FourWaySprite;
-import spriteData.behavior.boxes.Weaponry;
 
 /** Basic class for all weapon sprites.
  *
  */
-public class WeaponSprite extends FourWaySprite implements Weaponry {
-    private CollisionBox hitBox;
-
+public class WeaponSprite extends FourWaySprite {
     public WeaponSprite() {
         final String DEFAULT_PATH = "file:resources/sprites/wpns/sword/attk_4x4_32x32.png";
         setUp(DEFAULT_PATH);
@@ -24,20 +20,11 @@ public class WeaponSprite extends FourWaySprite implements Weaponry {
     private void setUp(String pathToFile) {
         setUpSprite(this, pathToFile);
 
-        hitBox = new CollisionBox(ColType.HITBOX);
-
         final double[] HIT_BOX_BOUNDS = new double[] {10.0, 10.0, 12.0, 14.0};
-        hitBox.setBounds(HIT_BOX_BOUNDS);
-        hitBox.setBaseBounds(HIT_BOX_BOUNDS);
-        getGroup().getChildren().add(hitBox.getColBox());
-    }
+        addBox(new CollisionBox(HITBOX));
 
-    @Override
-    public void setID(Integer ID) {
-        super.setID(ID);
-        hitBox.setID(ID);
+        getBox(HITBOX).setBounds(HIT_BOX_BOUNDS);
+        getBox(HITBOX).setBaseBounds(HIT_BOX_BOUNDS);
+        getGroup().getChildren().add(getBox(HITBOX).getColBox());
     }
-
-    @Override
-    public CollisionBox getHitBox() { return hitBox; }
 }

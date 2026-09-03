@@ -40,21 +40,7 @@ public abstract class CharMvmnt {
         sprite.setPos(nextPos[0], nextPos[1]);
     }
     private static double[] nextPos(DoubleVal speed, Dir direction, double[] currPos) {
-        switch (direction) {
-            case N:
-                currPos[1] -= speed.get();
-                break;
-            case S:
-                currPos[1] += speed.get();
-                break;
-            case E:
-                currPos[0] += speed.get();
-                break;
-            case W:
-                currPos[0] -= speed.get();
-                break;
-            default: return currPos;
-        }
+        currPos[Dir.axis(direction)] += Dir.sign(direction) * speed.get();
         return currPos;
     }
 

@@ -13,7 +13,7 @@ import values.IntVal;
  * For animations with one set of frames.
  * @see Sprite
  */
-public class AnimSprite extends Sprite {
+public abstract class AnimSprite extends Sprite {
 
     public final int BASE_FRAME_RATE = 128;
 

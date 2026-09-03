@@ -55,16 +55,16 @@ public class BoxSizer {
         box.setBounds(box.getBaseBounds());
     }
 
-    public static void sizeBoxEvenlyBiggerThan(CollisionBox boxToSize, CollisionBox baseBox) {
+    public static void sizeBoxEvenlyBiggerThan(CollisionBox boxToSize, CollisionBox baseBox, double factor) {
         double x = baseBox.getBaseBounds()[0];
         double y = baseBox.getBaseBounds()[1];
         double width = baseBox.getBaseBounds()[2];
         double height = baseBox.getBaseBounds()[3];
 
-        x -= (x / 2);
-        y -= (y / 2);
-        width += (width * 2);
-        height += (height * 2);
+        x -= (x / factor);
+        y -= (y / factor);
+        width += (width * factor);
+        height += (height * factor);
 
         boxToSize.setBaseBounds(new double[]{x, y, width, height});
         boxToSize.setBounds(boxToSize.getBaseBounds());

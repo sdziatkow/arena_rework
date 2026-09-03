@@ -4,11 +4,15 @@ import charData.GameChar;
 import charData.Level;
 import charData.attr.CharAttr;
 import charData.stat.CharStats;
+import itemData.Item;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
+import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.GridPane;
 import menus.gameCharDisp.AttrMenu;
@@ -20,6 +24,10 @@ import storageData.Storage;
 public class Menus {
     private static final GridPane menuSpace = new GridPane();
     public static final Group overlay = new Group(menuSpace);
+
+    public static void clearMenus() { menuSpace.getChildren().clear(); }
+
+//GAME-CHARACTER---------------------------------------------------------------------------------------------------------
 
     private static class MenuPicker {
         private final ListView<String> typeSelector;
@@ -33,6 +41,7 @@ public class Menus {
                     Menus.clearMenus();
                     return;
                 }
+                if (!menuSpace.getChildren().isEmpty()) clearMenus();
                 switch (MenuType.valueOf(selected)) {
                     case CHARACTER:
                         dispChar(gameChar);
@@ -75,31 +84,64 @@ public class Menus {
     }
 
     public static void dispStorage(Storage s) {
-        if (!menuSpace.getChildren().isEmpty()) clearMenus();
         StorageMenu menu = new StorageMenu(s);
         menuSpace.add(menu.main, menuSpace.getColumnCount(), menuSpace.getRowCount());
     }
 
     private static void dispAttr(CharAttr c, Level l) {
-        if (!menuSpace.getChildren().isEmpty()) clearMenus();
         AttrMenu menu = new AttrMenu(c, l);
         menuSpace.add(menu.main, menuSpace.getColumnCount(), menuSpace.getRowCount());
     }
 
     private static void dispStats(CharStats s) {
-        if (!menuSpace.getChildren().isEmpty()) clearMenus();
         StatMenu menu = new StatMenu(s);
         menuSpace.add(menu.main, menuSpace.getColumnCount(), menuSpace.getRowCount());
     }
 
     private static void dispChar(GameChar g) {
-        if (!menuSpace.getChildren().isEmpty()) clearMenus();
         CharMenu menu = new CharMenu(g);
         menuSpace.add(menu.main, menuSpace.getColumnCount(), menuSpace.getRowCount());
     }
 
-    public static void clearMenus() {
-        menuSpace.getChildren().clear();
+//STORAGE----------------------------------------------------------------------------------------------------------------
+
+    public static void dispStorageInteraction(Storage interactor, Storage interactable) {
+        if (!menuSpace.getChildren().isEmpty()) clearMenus();
+        StorageMenu m1 = new StorageMenu(interactor);
+        StorageMenu m2 = new StorageMenu(interactable);
+        Button put = new Button("Put");
+        Button take = new Button("Take");
+        EventHandler<ActionEvent> onMove = new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                Button src = (Button)actionEvent.getSource();
+                Storage fromStg = interactor;
+                Storage toStg = interactable;
+                StorageMenu m = m1;
+                if (src.getText().equals("Put")) {
+                    fromStg = interactor;
+                    toStg = interactable;
+                    m = m1;
+                }
+                else if (src.getText().equals("Take")) {
+                    fromStg = interactable;
+                    toStg = interactor;
+                    m = m2;
+                }
+                Item i = fromStg.grabByName(m.selectedItem());
+                fromStg.removeItem(i);
+                toStg.store(i);
+                i.setStorageID(toStg.getID());
+                m1.reset();
+                m2.reset();
+            }
+        };
+        put.setOnAction(onMove);
+        take.setOnAction(onMove);
+        m1.addBtnToItemDisp(put);
+        m2.addBtnToItemDisp(take);
+        menuSpace.add(m1.main, 0, 0);
+        menuSpace.add(m2.main, 0, 1);
     }
 
 }

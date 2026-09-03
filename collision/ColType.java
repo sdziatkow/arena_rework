@@ -16,5 +16,7 @@ public enum ColType {
     DETECTBOX,
     INTERACTBOX,
     WORLDBOX,
-    CHECKBOX
+    CHECKBOX;
+
+    public static ColType[] all() {return STAGEBOX.getDeclaringClass().getEnumConstants();}
 }

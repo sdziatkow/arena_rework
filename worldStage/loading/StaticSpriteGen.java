@@ -1,21 +1,20 @@
 package worldStage.loading;
 
-import spriteData.backgroundSprite.BGSprite;
 import spriteData.backgroundSprite.StaticSprite;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-public class BGSpriteGen {
+public class StaticSpriteGen {
 
-    public static BGSprite genBGSprite(String pathToData) {
+    public static StaticSprite genStaticSprite(String pathToData) {
         try { // Get the file set up.
             FileInputStream inFile = new FileInputStream(pathToData);
             Scanner scn = new Scanner(inFile);
             scn.useDelimiter("[|]|\\n");
 
-            BGSprite sprite = null;
+            StaticSprite sprite = null;
             if (scn.hasNext()) {
                 String field = scn.next();
                 String pathToFile =  scn.next();

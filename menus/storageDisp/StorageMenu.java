@@ -7,6 +7,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
@@ -21,8 +22,10 @@ public class StorageMenu {
     public GridPane main;
     private ListView<String> typeList;
     private ListView<String> itemList;
-    private GridPane itemDisp;
+    public GridPane itemDisp;
+    private ArrayList<Button> itemBtns;
     private Storage stg;
+    private String selectedItem;
 
 //LISTENERS--------------------------------------------------------------------------------------------------------------
 
@@ -58,6 +61,7 @@ public class StorageMenu {
     private final ChangeListener<String> onItemSelected = new ChangeListener<String>() {
         @Override
         public void changed(ObservableValue<? extends String> observableValue, String prev, String selected) {
+            selectedItem = selected;
             itemDisp.getChildren().clear();
             if (selected == null) return;
             else createItemDisp(selected);
@@ -72,6 +76,12 @@ public class StorageMenu {
         typeList = new ListView<>();
         itemList = new ListView<>();
         itemDisp = new GridPane();
+        itemBtns = new ArrayList<Button>();
+        setUpTypeList();
+    }
+
+    public void reset() {
+        main.getChildren().clear();
         setUpTypeList();
     }
 
@@ -113,17 +123,24 @@ public class StorageMenu {
 
 //INDIVIDUAL-ITEM--------------------------------------------------------------------------------------------------------
 
-    private void createItemDisp(String itemName) {
+    public void createItemDisp(String itemName) {
         Item i = stg.grabByName(itemName);
         ImageView img = new ImageView(FrameGen.genOneFrame(i.getPathToPickableSprite()));
 
         itemDisp.add(img, 0, 0, 2, 1);
 
         ArrayList<String> dispInfo = i.dispInfo();
-        int rowCount = 1;
-        for (int n = 0; n < dispInfo.size(); ++n) {
-            itemDisp.add(new Label(dispInfo.get(n)), n % 2, rowCount);
-            if (n % 2 == 1) ++rowCount;
+        for (int n = 2; n < dispInfo.size(); ++n) {
+            itemDisp.add(new Label(dispInfo.get(n)), n % 2, n / 2);
         }
+        for (int n = 0; n < itemBtns.size(); ++n) {
+            itemDisp.add(itemBtns.get(n), 0, itemDisp.getRowCount(), 2, 1);
+        }
+    }
+
+    public String selectedItem() {return selectedItem;}
+
+    public void addBtnToItemDisp(Button btn) {
+        itemBtns.add(btn);
     }
 }

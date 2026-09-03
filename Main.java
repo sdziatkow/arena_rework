@@ -34,6 +34,7 @@ public class Main extends Application {
         final Stage s = stage;
         Scene sc = new Scene(WorldData.bg, 3000, 3000, true);
         sc.setCamera(cam);
+        cam.setCache(true);
         Menus.overlay.getChildren().add(cam);
         Menus.overlay.setCache(true); // Must have this or else will not render correctly.
         CharMvmnt.bindNode(SpriteTracker.charSprites.get(SpriteTracker.playerID), Menus.overlay);
@@ -87,9 +88,7 @@ public class Main extends Application {
         gameTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                Platform.runLater(() -> {
-                    WorldData.runMvmnt();
-                });
+                Platform.runLater(WorldData::runMvmnt);
             }
         }, 0, 32);
     }

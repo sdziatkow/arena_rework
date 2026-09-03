@@ -1,5 +1,7 @@
 package spriteData;
 
+import collision.ColType;
+import collision.CollisionBox;
 import control.ArenaObject;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
@@ -8,19 +10,24 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.image.WritableImage;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <br>spriteView:  Contains WritableImage of this sprite's current frame. getFrame()
  * <br>spritePane:  Can contain multiple spriteViews stacked on one another. getPane()
  * <br>spriteGroup: Contains spritePane and any other additional elements such as CollisionBoxes.
  * <br>pos:         Property that is bound to spriteGroup's scene position.
+ * <br>boxes:       The CollisionBoxes that this Sprite has in its group.
  */
-public class Sprite extends ArenaObject {
+public abstract class Sprite extends ArenaObject {
     private ImageView spriteView;
     private StackPane spritePane;
 
     private Group spriteGroup;
 
     private DoubleProperty[] pos;
+    private Map<ColType, CollisionBox> boxes;
 
     /**
      * Default constructor, creates an empty sprite.
@@ -35,7 +42,12 @@ public class Sprite extends ArenaObject {
 
         spriteGroup.translateXProperty().bind(pos[0]);
         spriteGroup.translateYProperty().bind(pos[1]);
+        boxes = new HashMap<>();
+
         spriteGroup.setCache(true);
+        spriteView.setCache(true);
+        spritePane.setCache(true);
+        boxes = new HashMap<>();
     }
 
 //SETTERS----------------------------------------------------------------------------------------------------------------
@@ -77,4 +89,27 @@ public class Sprite extends ArenaObject {
         );
         return pos[axis];
     }
+
+//BOXES------------------------------------------------------------------------------------------------------------------
+
+    @Override
+    public void setID(Integer id) {
+        super.setID(id);
+        for (CollisionBox box : boxes.values()) {
+            box.setID(id);
+        }
+    }
+
+    public void addBox(CollisionBox b) {
+        ColType t = b.getColType();
+        if (!boxes.containsKey(t)) {
+            boxes.put(t, b);
+        }
+        else {
+            boxes.replace(t, b);
+        }
+    }
+
+    public CollisionBox getBox(ColType t) {return boxes.get(t);}
+    public boolean hasBox(ColType t) { return boxes.containsKey(t); }
 }
