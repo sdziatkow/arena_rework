@@ -1,6 +1,7 @@
 package collision;
 
 import javafx.geometry.Bounds;
+import javafx.scene.shape.Path;
 import spriteData.behavior.boxes.*;
 
 import java.util.Map;
@@ -9,20 +10,31 @@ import java.util.Stack;
 
 public class ColChecker {
 
+    public static Stack<Integer> isPathColliding(int avoidID, Path p, Map<Integer, CollisionBox> allSprites) {
+        Stack<Integer> collidingWith = new Stack<>();
+        Bounds pathBounds = p.getBoundsInLocal();
+        allSprites.forEach((id, other) -> {
+            if (id != avoidID) {
+                if (other.getBounds().intersects(pathBounds)) {
+                    collidingWith.push(id);
+                }
+            }
+        });
+        return collidingWith;
+    }
+
     /**
      *
-     * @param sprite A Movable Sprite (one with a checkBox).
-     * @param allSprites All sprites needing to check against (ones with a worldBox).
+     * @param checkFor box to check for.
+     * @param checkAgainst All sprites needing to check against.
      * @return A Stack of all Collidable Sprite's IDs that this Moveable Sprite's checkBox is colliding with.
      * @see Movable
-     * @see Collidable
      */
-    public static Stack<Integer> isColliding(Movable sprite, Map<Integer, Collidable> allSprites) {
+    public static Stack<Integer> isColliding(CollisionBox checkFor, Map<Integer, CollisionBox> checkAgainst) {
         Stack<Integer> collidingWith = new Stack<>();
-        Bounds spriteBounds = sprite.getCheckBox().getBounds();
-        allSprites.forEach((id, other) -> {
-            if (!(sprite.getCheckBox().getID() == id)) {
-                if (other.getWorldBox().getBounds().intersects(spriteBounds)) {
+        checkAgainst.forEach((id, box) -> {
+            if (checkFor.getID() != id) {
+                if (checkFor.getBounds().intersects(box.getBounds())) {
                     collidingWith.push(id);
                 }
             }
@@ -31,44 +43,25 @@ public class ColChecker {
     }
 
     /**
-     *
-     * @param sprite A Movable Sprite (one with a checkBox).
-     * @param allSprites All sprites needing to check against (ones with an interactBox).
-     * @return A Stack of all Interactable Sprite's IDs that this Moveable Sprite's checkBox is colliding with.
+     * @param avoidID An ID different from the given checkFor's ID that should not be checked.
+     * @param checkFor box to check for.
+     * @param checkAgainst All sprites needing to check against.
+     * @return A Stack of all Collidable Sprite's IDs that this Moveable Sprite's checkBox is colliding with.
      * @see Movable
-     * @see Interactable
      */
-    public static Stack<Integer> isInteracting(Movable sprite, Map<Integer, Interactable> allSprites) {
+    public static Stack<Integer> isColliding(
+            int avoidID,
+            CollisionBox checkFor,
+            Map<Integer, CollisionBox> checkAgainst
+    ) {
         Stack<Integer> collidingWith = new Stack<>();
-        Bounds spriteBounds = sprite.getCheckBox().getBounds();
-        allSprites.forEach((id, other) -> {
-            if (!(sprite.getCheckBox().getID() == id)) {
-                if (other.getInteractBox().getBounds().intersects(spriteBounds)) {
+        checkAgainst.forEach((id, box) -> {
+            if (checkFor.getID() != id && avoidID != id) {
+                if (checkFor.getBounds().intersects(box.getBounds())) {
                     collidingWith.push(id);
                 }
             }
         });
         return collidingWith;
-    }
-
-    /**
-     * @param avoidID The ID of the hurtBox to avoid checking for (don't hit yourself).
-     * @param wpn A Weaponry Sprite (one with a hitBox).
-     * @param allSprites All sprites needing to check against (ones with a hurtBox).
-     * @return A Stack of all Hurtable Sprite's IDs that this Weaponry Sprite's hitBox is colliding with.
-     * @see Weaponry
-     * @see Hurtable
-     */
-    public static Stack<Integer> isHitting(Integer avoidID, Weaponry wpn, Map<Integer, Hurtable> allSprites) {
-        Stack<Integer> ids = new Stack<>();
-        Bounds wpnBounds = wpn.getHitBox().getBounds();
-        allSprites.forEach((id, other) -> {
-            if (!Objects.equals(avoidID, other.getHurtBox().getID())) {
-                if (other.getHurtBox().getBounds().intersects(wpnBounds)) {
-                    ids.push(id);
-                }
-            }
-        });
-        return ids;
     }
 }

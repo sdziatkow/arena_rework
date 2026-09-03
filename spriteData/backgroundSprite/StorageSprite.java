@@ -1,7 +1,6 @@
 package spriteData.backgroundSprite;
 
 import collision.BoxSizer;
-import collision.ColType;
 import collision.CollisionBox;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -9,13 +8,12 @@ import javafx.scene.image.WritableImage;
 import menus.Menus;
 import spriteData.AnimSprite;
 import spriteData.FrameGen;
-import spriteData.behavior.boxes.Collidable;
 import spriteData.behavior.boxes.Interactable;
 import worldData.WorldData;
+import static collision.ColType.WORLDBOX;
+import static collision.ColType.INTERACTBOX;
 
-public class StorageSprite extends AnimSprite implements Collidable, Interactable {
-    private CollisionBox worldBox;
-    private CollisionBox interactBox;
+public class StorageSprite extends AnimSprite implements Interactable {
     private boolean isOpen;
 
     public StorageSprite() {
@@ -42,31 +40,16 @@ public class StorageSprite extends AnimSprite implements Collidable, Interactabl
             }
         });
 
-        worldBox = new CollisionBox();
-        interactBox = new CollisionBox(ColType.INTERACTBOX);
+        addBox(new CollisionBox(WORLDBOX));
+        addBox(new CollisionBox(INTERACTBOX));
 
-        BoxSizer.sizeBoxSmallMid(pathToFile, worldBox);
-        BoxSizer.sizeBoxEvenlyBiggerThan(interactBox, worldBox);
+        BoxSizer.sizeBoxSmallMid(pathToFile, getBox(WORLDBOX));
+        BoxSizer.sizeBoxEvenlyBiggerThan(getBox(INTERACTBOX), getBox(WORLDBOX), 2.0);
 
-        getGroup().getChildren().add(worldBox.getColBox());
-        getGroup().getChildren().add(interactBox.getColBox());
+        getGroup().getChildren().add(getBox(WORLDBOX).getColBox());
+        getGroup().getChildren().add(getBox(INTERACTBOX).getColBox());
+
         isOpen = false;
-    }
-
-    @Override
-    public CollisionBox getWorldBox() {
-        return worldBox;
-    }
-
-    @Override
-    public CollisionBox getInteractBox() {
-        return interactBox;
-    }
-
-    @Override
-    public void setID(Integer id) {
-        super.setID(id);
-        interactBox.setID(id);
     }
 
     @Override

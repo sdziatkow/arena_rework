@@ -4,7 +4,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.paint.Color;
 import javafx.geometry.Bounds;
 import spriteData.Dir;
-
 import java.util.Objects;
 
 public class CollisionBox {
@@ -90,12 +89,6 @@ public class CollisionBox {
 //SETTERS----------------------------------------------------------------------------------------------------------------
 
     /**
-     * 3 cases:
-     *      <br> case 1: This will be used within a Group for a SpriteData object.
-     *      <br>         This should be set to the SpriteData Object's getID().
-     *      <br> case 3: Any other case
-     *      <br>         Not implemented a stage background with dirt walls etc but will eventually need standAlone box.
-     *      <br>         Otherwise set it to its SpriteData's getID()
      * @param x The ID of this object.
      */
     public void setID(int x) {
@@ -146,6 +139,9 @@ public class CollisionBox {
     /** will return y value of northern-most point of rectangle. */
     public double getMinY() { return colBox.localToScene(colBox.getBoundsInLocal()).getMinY(); }
 
+    /** @return Array of length 2 [midX, midY]. */
+    public double[] midPos() { return new double[]{getMidX(), getMidY()};}
+
     /** Will return a Bounds object of rectangle. */
     public Bounds getBounds() { return colBox.localToScene(colBox.getBoundsInLocal()); }
 
@@ -174,6 +170,10 @@ public class CollisionBox {
      */
     public void checkDir(double amnt, Dir direction) {
         contract();
+        expandBox(amnt, direction);
+    }
+
+    public void expandBox(double amnt, Dir direction) {
 
         // North or south.
         if (direction.equals(Dir.N) || direction.equals(Dir.S)) {

@@ -1,26 +1,29 @@
 package worldStage;
 
 import charData.GameChar;
+import charData.stat.Stat;
+import collision.ColType;
 import control.IDGen;
 import itemData.Item;
 import itemData.weapons.Weapon;
 import javafx.scene.Group;
-import movement.CharMvmnt;
-import movement.NPCState;
+import menus.statBar.StatBar;
 import movement.PlayerMvmnt;
-import spriteData.backgroundSprite.BGSprite;
 import spriteData.backgroundSprite.PickableSprite;
+import spriteData.backgroundSprite.StaticSprite;
 import spriteData.backgroundSprite.StorageSprite;
+import spriteData.behavior.SpriteBehavior;
 import spriteData.charSprite.CharSprite;
 import spriteData.charSprite.CombatSprite;
 import storageData.EQSlots;
 import storageData.Storage;
+import worldData.objectData.MvmntTracker;
 import worldData.objectData.SpriteTracker;
 import worldData.statData.StatTracker;
 import worldData.statData.StorageTracker;
-import worldStage.loading.BGSpriteGen;
 import worldStage.loading.GameCharGen;
 import worldStage.loading.ItemGen;
+import worldStage.loading.StaticSpriteGen;
 
 /** For instantiating Arena Objects and creating a playable world space. */
 public class WorldStage {
@@ -32,18 +35,29 @@ public class WorldStage {
         int playerID = addChar(
                 GameCharGen.genChar("resources/object_data/char_data/default_char.txt"),
                 new int[]{100, 100},
-                null
+                null,
+                false,
+                false
         );
         setUpPlayer(playerID);
 
         addChar(
             GameCharGen.genChar("resources/object_data/char_data/log.txt"),
                 new int[]{100, 200},
-                null
+                null,
+                false,
+                true
         );
 
-        addBGSprite(
-            BGSpriteGen.genBGSprite("resources/object_data/bg_sprite_data/stone_tower.txt"),
+        addChar(GameCharGen.genChar("resources/object_data/char_data/test_enemy.txt"),
+                new int[]{100, 300},
+                null,
+                true,
+                true
+        );
+
+        addStaticSprite(
+            StaticSpriteGen.genStaticSprite("resources/object_data/bg_sprite_data/stone_tower.txt"),
             new int[]{200, 100}
         );
 
@@ -58,6 +72,16 @@ public class WorldStage {
             1,
             new int[]{50, 100}
         );
+        setUpStatBars();
+    }
+
+    public void setUpStatBars() {
+        SpriteTracker.charSprites.forEach((Integer id, CharSprite sprite) -> {
+//            if (id != SpriteTracker.playerID) {
+                StatBar bar = new StatBar(Stat.HP, StatTracker.gameChars.get(id).stats().get(Stat.HP));
+                sprite.setStatBar(bar);
+//            }
+        });
     }
 
     public void setUpPlayer(int playerID) {
@@ -84,13 +108,15 @@ public class WorldStage {
      * @param items The items to store in the gameChar's Storage.
      * @return The gameCharacter's ID.
      */
-    public int addChar(GameChar gameChar, int[] pos, Item[] items) {
+    public int addChar(GameChar gameChar, int[] pos, Item[] items, boolean isHostile, boolean isNPC) {
         final int ID = IDGen.genID();
         gameChar.setID(ID);
         CharSprite sprite;
 
         if (gameChar.getPathToAttkSheet() != null) {
             sprite = new CombatSprite(gameChar.getPathToMvSheet(), gameChar.getPathToAttkSheet());
+            ((CombatSprite)sprite).getWPSprite().setID(ID);
+            if (isHostile) SpriteBehavior.enableHostility((CombatSprite)sprite);
         }else sprite = new CharSprite(gameChar.getPathToMvSheet());
 
         Storage backpack = new Storage();
@@ -100,16 +126,16 @@ public class WorldStage {
         backpack.setID(ID);
         eqSlots.setID(ID);
 
-        SpriteTracker.addSprite(sprite);
+        SpriteTracker.trackSprite(sprite);
         StatTracker.trackGameChar(gameChar);
         StorageTracker.trackStorage(backpack);
         StorageTracker.trackEQSlots(eqSlots);
+        if (isNPC) MvmntTracker.trackMvmnt(sprite);
 
         if (items != null) fillStorage(backpack, items);
 
         world.getChildren().add(sprite.getGroup());
         sprite.setPos(pos[0], pos[1]);
-        sprite.setNPCState(NPCState.FREE);
 //        sprite.getWorldBox().getColBox().setOpacity(1);
 //        sprite.getCheckBox().getColBox().setOpacity(1);
 //        sprite.getHurtBox().getColBox().setOpacity(1);
@@ -125,10 +151,10 @@ public class WorldStage {
      * @param pos The position of this sprite's spriteGroup within the world group.
      * @return The ID of the given sprite.
      */
-    public int addBGSprite(BGSprite sprite, int[] pos) {
+    public int addStaticSprite(StaticSprite sprite, int[] pos) {
         final int ID = IDGen.genID();
         sprite.setID(ID);
-        SpriteTracker.addSprite(sprite);
+        SpriteTracker.trackSprite(sprite);
 
         world.getChildren().add(sprite.getGroup());
         sprite.setPos(pos[0], pos[1]);
@@ -152,15 +178,16 @@ public class WorldStage {
         Storage storage = new Storage();
         storage.setID(ID);
 
-        SpriteTracker.addSprite(sprite);
+        SpriteTracker.trackSprite(sprite);
         StorageTracker.trackStorage(storage);
 
         if (items != null) fillStorage(storage, items);
 
         world.getChildren().add(sprite.getGroup());
         sprite.setPos(pos[0], pos[1]);
-//        sprite.getWorldBox().getColBox().setOpacity(1);
-//        sprite.getInteractBox().getColBox().setOpacity(1);
+
+        sprite.getBox(ColType.WORLDBOX).getColBox().setOpacity(1);
+        sprite.getBox(ColType.INTERACTBOX).getColBox().setOpacity(1);
         return ID;
     }
 
@@ -186,7 +213,7 @@ public class WorldStage {
 
         PickableSprite idleSprite = new PickableSprite(item.getPathToPickableSprite());
         idleSprite.setID(ID);
-        SpriteTracker.addSprite(idleSprite);
+        SpriteTracker.trackSprite(idleSprite);
 
         world.getChildren().add(idleSprite.getGroup());
         idleSprite.setPos(pos[0], pos[1]);

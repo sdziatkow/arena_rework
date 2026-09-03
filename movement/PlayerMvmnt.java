@@ -6,8 +6,9 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import spriteData.Dir;
 import spriteData.MovingSprite;
-import spriteData.charSprite.CharSprite;
 import spriteData.charSprite.CombatSprite;
+
+import static collision.ColType.CHECKBOX;
 
 /**
  * @see MovingSprite For more information on where the sprite's speed field is coming from.
@@ -95,7 +96,7 @@ public class PlayerMvmnt extends CharMvmnt {
                     else if (a) sprite.switchDir(Dir.W);
                 }
 
-                sprite.getCheckBox().checkDir(sprite.getSpeed().getMax() * 2, sprite.getDir());
+                sprite.getBox(CHECKBOX).checkDir(sprite.getSpeed().getMax() * 2, sprite.getDir());
             }
         });
 

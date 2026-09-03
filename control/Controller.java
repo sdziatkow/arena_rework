@@ -1,5 +1,6 @@
 package control;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.scene.input.KeyCode;
@@ -23,10 +24,10 @@ public class Controller {
                 mvmntKeysDown.add(key);
             break;
             case E:
-                WorldData.triggerInteract(SpriteTracker.playerID);
+                Platform.runLater(() -> WorldData.triggerInteract(SpriteTracker.playerID));
                 break;
             case I:
-                WorldData.openPicker(SpriteTracker.playerID);
+                Platform.runLater(() -> WorldData.openPicker(SpriteTracker.playerID));
                 break;
             default: return;
         }

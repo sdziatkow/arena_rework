@@ -10,6 +10,9 @@ import spriteData.behavior.combat.Combatant;
 import spriteData.weaponSprite.WeaponSprite;
 import worldData.WorldData;
 
+import static collision.ColType.HITBOX;
+import static collision.ColType.WORLDBOX;
+
 public class CombatSprite extends CharSprite implements Combatant {
     private FourWaySprite attkSprite;
     private WeaponSprite wpSprite;
@@ -45,7 +48,7 @@ public class CombatSprite extends CharSprite implements Combatant {
                 getFrame().setVisible(true);
                 attkSprite.getFrame().setVisible(false);
                 wpSprite.getFrame().setVisible(false);
-                wpSprite.getHitBox().contract();
+                wpSprite.getBox(HITBOX).contract();
             }
         };
 
@@ -64,9 +67,9 @@ public class CombatSprite extends CharSprite implements Combatant {
 
     @Override
     public void onAttk() {
-        double hitBoxMvAmnt = getWorldBox().getBounds().getWidth() / 2.0;
-        if (getDir().equals(Dir.N) || getDir().equals(Dir.W)) hitBoxMvAmnt += (0.25 * hitBoxMvAmnt);
-        wpSprite.getHitBox().checkDir(hitBoxMvAmnt, getDir());
+        double hitBoxMvAmnt = getBox(WORLDBOX).getBounds().getWidth() / 2.0;
+        if (Dir.sign(getDir()) < 0) hitBoxMvAmnt += (0.25 * hitBoxMvAmnt);
+        wpSprite.getBox(HITBOX).checkDir(hitBoxMvAmnt, getDir());
 
 
         if (!attkSprite.isAnimRunning() && !wpSprite.isAnimRunning()) {
@@ -87,13 +90,4 @@ public class CombatSprite extends CharSprite implements Combatant {
 
     @Override
     public WeaponSprite getWPSprite() { return wpSprite; }
-
-//CLASS-SPECIFIC---------------------------------------------------------------------------------------------------------
-
-    @Override
-    public void setID(Integer ID) {
-        super.setID(ID);
-        wpSprite.setID(ID);
-    }
-
 }

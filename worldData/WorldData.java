@@ -1,6 +1,5 @@
 package worldData;
 
-import charData.stat.Stat;
 import collision.ColChecker;
 import control.AttkHandler;
 import control.ViewHelper;
@@ -10,10 +9,14 @@ import menus.Menus;
 import movement.MvState;
 import movement.PlayerMvmnt;
 import movement.npcMvmnt.NPCMvmnt;
+import worldData.objectData.BoxTracker;
+import worldData.objectData.MvmntTracker;
 import worldData.objectData.SpriteTracker;
 import worldData.statData.StatTracker;
 import worldData.statData.StorageTracker;
 import java.util.Stack;
+
+import static collision.ColType.*;
 
 public class WorldData {
     public static GameState state = GameState.RUNNING;
@@ -23,19 +26,18 @@ public class WorldData {
 //STATE------------------------------------------------------------------------------------------------------------------
 
     public static void runMvmnt() {
-        ViewHelper.updateViewOrder(SpriteTracker.collidables);
+        ViewHelper.updateViewOrder(BoxTracker.getBoxes(WORLDBOX));
         Menus.overlay.toFront();
-        SpriteTracker.movables.forEach((id, mover) -> {
-            if (id == SpriteTracker.playerID) {
-                Stack<Integer> collidingWith = ColChecker.isColliding(mover, SpriteTracker.collidables);
-                if (!collidingWith.isEmpty()) PlayerMvmnt.forceState(MvState.STOPPED);
-                else PlayerMvmnt.runMvmnt();
-            }
-            else {
-                NPCMvmnt.setSprite(SpriteTracker.charSprites.get(id));
-                NPCMvmnt.move();
-            }
-        });
+
+        // Run Player Movement
+        Stack<Integer> collidingWith = ColChecker.isColliding(
+            BoxTracker.getBox(CHECKBOX, SpriteTracker.playerID), BoxTracker.getBoxes(WORLDBOX)
+        );
+        if (!collidingWith.isEmpty()) PlayerMvmnt.forceState(MvState.STOPPED);
+        else PlayerMvmnt.runMvmnt();
+
+        // Run NPC Movement
+        MvmntTracker.allNPCMvmnts.values().forEach(NPCMvmnt::runMvmnt);
     }
 
 //GAME-EVENTS------------------------------------------------------------------------------------------------------------
@@ -48,21 +50,21 @@ public class WorldData {
      */
     public static void triggerAttk(Integer cmbtSprite, Integer wpSprite) {
 
-        Stack<Integer> hitting = ColChecker.isHitting(
+        Stack<Integer> hitting = ColChecker.isColliding (
                 cmbtSprite,
-                SpriteTracker.weapons.get(wpSprite),
-                SpriteTracker.hurtables
+                BoxTracker.getBox(HITBOX, wpSprite),
+                BoxTracker.getBoxes(HURTBOX)
         );
         if (!hitting.isEmpty()) {
             for (Integer id : hitting) {
-                AttkHandler.handleAttk(cmbtSprite, id, StatTracker.gameChars);
+                SpriteTracker.hurtables.get(id).onHurt(cmbtSprite);
             }
         }
     }
 
     public static void triggerInteract(int interactor) {
-        Stack<Integer> interactingWith = ColChecker.isInteracting(
-                SpriteTracker.movables.get(interactor), SpriteTracker.interactables
+        Stack<Integer> interactingWith = ColChecker.isColliding(
+            BoxTracker.getBox(CHECKBOX, interactor), BoxTracker.getBoxes(INTERACTBOX)
         );
         while (!interactingWith.isEmpty()) {
             SpriteTracker.interactables.get(interactingWith.pop()).onInteract(interactor);

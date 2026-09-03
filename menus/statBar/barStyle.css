@@ -1,0 +1,27 @@
+.progress-bar {
+    -fx-pref-width: 24px;
+    -fx-pref-height: 4px;
+    -fx-padding: 0.5 0 0 8;
+}
+
+/* Targets the container background (the track) */
+.progress-bar .track {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+}
+
+/* Optional: Targets the moving part of the bar */
+.progress-bar .bar {
+    -fx-background-insets: 0;
+    /* Change color here if needed */
+}
+
+.HP {
+    -fx-accent: red;
+}
+.SP {
+    -fx-accent: green;
+}
+.MP {
+    -fx-accent: blue;
+}

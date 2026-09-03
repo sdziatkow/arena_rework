@@ -52,6 +52,9 @@ public class IntVal {
         if (max <= min) throw new IllegalArgumentException("Can not set max value to be less than min value.");
     }
 
+    public boolean isMax() {return val == max;}
+    public boolean isMin() {return val == min;}
+
     @Override
     public String toString() {
         String out = "|MIN: " + min;

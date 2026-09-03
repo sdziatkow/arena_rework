@@ -9,7 +9,7 @@ public abstract class CharData extends ArenaObject {
 
     public CharData() {
         pathToMvSheet = "file:resources/sprites/character/move_4x4_16x32.png";
-        pathToAttkSheet = "file:resources/sprites/character/attk_4x4_32x32.png";
+        pathToAttkSheet = null;
         name = "ERROR:NOT-SET";
     }
 

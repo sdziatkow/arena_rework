@@ -1,78 +1,157 @@
 package movement.npcMvmnt;
 
 import collision.ColChecker;
+import collision.CollisionBox;
 import movement.CharMvmnt;
-import movement.MvState;
 import movement.NPCState;
+import movement.PathFinder;
 import spriteData.Dir;
 import spriteData.charSprite.CharSprite;
-import worldData.objectData.SpriteTracker;
+import spriteData.charSprite.CombatSprite;
+import values.IntVal;
+import worldData.objectData.BoxTracker;
+
+import java.util.Random;
 import java.util.Stack;
 
-public class NPCMvmnt extends CharMvmnt {
-    private static CharSprite sprite = null;
-    private static MvState mvState = null;
-    private static NPCState npcState = null;
-    private static FreeMvmnt freeMv = new FreeMvmnt();
+import static collision.ColType.*;
+import static collision.ColType.HURTBOX;
+import static movement.NPCState.COMBAT;
 
-    public static void setSprite(CharSprite s) {
+public class NPCMvmnt {
+    private CharSprite sprite;
+    private NPCState state;
+    private CollisionBox movingTo;
+    private IntVal mvCount;
+    private int mvGen;
+
+    public NPCMvmnt() {
+        sprite = null;
+        state = null;
+        movingTo = null;
+        mvCount = null;
+        mvGen = 10;
+    }
+
+    public NPCMvmnt(CharSprite s) {
         sprite = s;
-        mvState = sprite.getMvState();
-        npcState = sprite.getNPCState();
+        state = sprite.getNPCState();
+        movingTo = null;
+        mvCount = new IntVal();
+        mvCount.setMax(40);
+        mvGen = 10;
     }
 
-    private static void setMvState() {
+//STATE-MACHINE----------------------------------------------------------------------------------------------------------
 
+    public void runMvmnt() {
+        move();
     }
 
-    private static void setNpcState() {
-
-    }
-
-    public static void move() {
-        if (sprite.getNPCState() == null) return;
-        switch (sprite.getNPCState()) {
-            case IDLE: return;
+    private void move() {
+        switch (state) {
+            case IDLE:
+                break;
             case FREE:
-                freeMove();
+                free();
+                break;
+            case HUNTING:
+                hunt();
                 break;
             case COMBAT:
+                moveToBox(movingTo);
                 break;
-            default: return;
         }
     }
 
-    private static void freeMove() {
-        boolean readyToMv = sprite.dirCount.get() < sprite.dirCount.getMax() && freeMv.readyToMove();
-        if (readyToMv && canMove(sprite.getDir())) {
-            if (sprite.dirCount.get() == sprite.dirCount.getMin()) { // This means NPC is just beginning his new move.
-                sprite.switchDir(freeMv.randomNewDir(sprite.getDir()));
-            }
-            onMove(sprite);
-            sprite.dirCount.inc();
+//BASIC-OPERATIONS-------------------------------------------------------------------------------------------------------
+
+    private void moveCheckBox(Dir dir) {
+        sprite.getBox(CHECKBOX).checkDir(sprite.getSpeed().getMax() * 2, dir);
+    }
+
+    private Stack<Integer> getCollidingWith() {
+        Stack<Integer> collidingWith = ColChecker.isColliding(
+                sprite.getID(), sprite.getBox(CHECKBOX), BoxTracker.getBoxes(WORLDBOX)
+        );
+        return collidingWith;
+    }
+
+    private Stack<Integer> getDetectedHurtBoxes() {
+        Stack<Integer> collidingWith = ColChecker.isColliding(
+                sprite.getID(), sprite.getBox(DETECTBOX), BoxTracker.getBoxes(HURTBOX)
+        );
+        return collidingWith;
+    }
+
+//STATES-----------------------------------------------------------------------------------------------------------------
+
+    public void free() {
+        if (mvGen > 9) { // So the sprite is not constantly moving.
+            CharMvmnt.halt(sprite.getSpeed());
+            CharMvmnt.onStopped(sprite);
+            Random gen = new Random();
+            mvGen = Math.abs(gen.nextInt(1000));
         }
-        else if (readyToMv) {
-            sprite.switchDir(freeMv.randomNewDir(sprite.getDir()));
+        else if (mvCount.isMax()) { // Move has been completed, switch to random direction.
+            mvCount.reset();
+            sprite.switchDir(Dir.randomDir());
+            moveCheckBox(sprite.getDir());
+            mvGen = 10;
+        }
+        else { // Otherwise move the NPC.
+            Stack<Integer> collidingWith = getCollidingWith();
+            if (collidingWith.isEmpty()) { // If can move, then move.
+                CharMvmnt.onMove(sprite);
+                mvCount.inc();
+            }
+            else { // Otherwise stop and switch to new direction.
+                CharMvmnt.halt(sprite.getSpeed());
+                CharMvmnt.onStopped(sprite);
+
+                sprite.switchDir(Dir.randomDir(sprite.getDir()));
+                moveCheckBox(sprite.getDir());
+            }
+        }
+    }
+
+    public void hunt() {
+        free();
+        Stack<Integer> detected = getDetectedHurtBoxes();
+        if (!detected.isEmpty()) {
+            movingTo = BoxTracker.getBox(HURTBOX, detected.pop());
+            state = COMBAT;
+        }
+    }
+
+//MOVEMENT---------------------------------------------------------------------------------------------------------------
+
+    public void moveToBox(CollisionBox box) {
+        double[] boxMidPos = box.midPos();
+        double[] myMidPos = sprite.getBox(WORLDBOX).midPos();
+        Dir nextMove = PathFinder.bestMoveTowards(myMidPos, boxMidPos);
+
+        // Check if can move in nextMove
+        moveCheckBox(nextMove);
+        Stack<Integer> collidingWith = getCollidingWith();
+
+        if (collidingWith.isEmpty()) { // Nothing in the way.
+            sprite.switchDir(nextMove);
+            CharMvmnt.onMove(sprite);
         }
         else {
-            halt(sprite.getSpeed());
-            onStopped(sprite);
-            freeMv.genMv();
-            sprite.dirCount.reset();
+            if (collidingWith.contains(box.getID())) { // Colliding with box that I am moving towards (made it).
+                CharMvmnt.halt(sprite.getSpeed());
+                CharMvmnt.onStopped(sprite);
+                if (state.equals(COMBAT)) ((CombatSprite)sprite).onAttk();
+            }
+            else { // Colliding with box that is in the way, I must move around it.
+                CollisionBox moveAround = BoxTracker.getBox(WORLDBOX, collidingWith.pop());
+                nextMove = PathFinder.bestMoveAround(sprite.getDir(), myMidPos, moveAround.midPos());
+                sprite.switchDir(nextMove);
+                CharMvmnt.onMove(sprite);
+            }
         }
     }
 
-    private static void moveCheckBox(CharSprite sprite, Dir dir) {
-        sprite.getCheckBox().checkDir(sprite.getSpeed().getMax() * 2, dir);
-    }
-
-    private static boolean canMove(Dir move) {
-        moveCheckBox(sprite, move);
-        Stack<Integer> collidingWith = ColChecker.isColliding(sprite, SpriteTracker.collidables);
-        if (!collidingWith.isEmpty()) {
-            moveCheckBox(sprite, sprite.getDir());
-            return false;
-        }
-        else return true;
-    }
 }

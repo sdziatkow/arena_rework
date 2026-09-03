@@ -1,15 +1,15 @@
 package spriteData.backgroundSprite;
 
 import collision.BoxSizer;
-import collision.ColType;
 import collision.CollisionBox;
 import spriteData.behavior.boxes.Interactable;
 import worldData.WorldData;
-import worldData.statData.StorageTracker;
+
+import static collision.ColType.WORLDBOX;
+import static collision.ColType.INTERACTBOX;
 
 /** For sprites that can be picked up and are only one frame. */
 public class PickableSprite extends StaticSprite implements Interactable {
-    CollisionBox interactBox;
 
     public PickableSprite() {
         final String DEFAULT_FILE = "file:resources/sprites/wpns/sword/idle_1x1_16x16.png";
@@ -23,27 +23,17 @@ public class PickableSprite extends StaticSprite implements Interactable {
     }
 
     private void setUp(String pathToFile) {
-        interactBox = new CollisionBox(ColType.INTERACTBOX);
-        getGroup().getChildren().add(interactBox.getColBox());
+        addBox(new CollisionBox(INTERACTBOX));
+        getGroup().getChildren().add(getBox(INTERACTBOX).getColBox());
 
-        BoxSizer.sizeBoxSmallMid(pathToFile, getWorldBox());
-        BoxSizer.sizeBoxBigMid(pathToFile, interactBox);
+        BoxSizer.sizeBoxSmallMid(pathToFile, getBox(WORLDBOX));
+        BoxSizer.sizeBoxEvenlyBiggerThan(getBox(INTERACTBOX), getBox(WORLDBOX), 2.0);
     }
-
-    @Override
-    public void setID(Integer id) {
-        super.setID(id);
-        interactBox.setID(id);
-    }
-
-    @Override
-    public CollisionBox getInteractBox() {return interactBox;}
 
     @Override
     public void onInteract(int interactorID) {
         WorldData.onItemPickedUp(interactorID, getID());
         WorldData.removeSprite(getID());
-        System.out.println(StorageTracker.storages.get(interactorID).all().toString());
     }
 
 }
