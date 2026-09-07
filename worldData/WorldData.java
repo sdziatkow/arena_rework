@@ -1,39 +1,47 @@
 package worldData;
 
 import collision.ColChecker;
+import collision.ColType;
 import control.AttkHandler;
 import control.ViewHelper;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.ParallelCamera;
+import javafx.scene.layout.GridPane;
 import menus.Menus;
 import movement.MvState;
 import movement.PlayerMvmnt;
 import movement.npcMvmnt.NPCMvmnt;
+import tileSet.TileSet;
 import worldData.objectData.BoxTracker;
 import worldData.objectData.MvmntTracker;
 import worldData.objectData.SpriteTracker;
 import worldData.statData.StatTracker;
 import worldData.statData.StorageTracker;
+
+import java.util.Objects;
 import java.util.Stack;
 
 import static collision.ColType.*;
 
 public class WorldData {
     public static GameState state = GameState.RUNNING;
-    public static Group bg;
+    public static TileSet bg;
     public static ParallelCamera cam = new ParallelCamera();
 
 //STATE------------------------------------------------------------------------------------------------------------------
 
     public static void runMvmnt() {
         ViewHelper.updateViewOrder(BoxTracker.getBoxes(WORLDBOX));
+        bg.getBorder().toFront();
         Menus.overlay.toFront();
+
 
         // Run Player Movement
         Stack<Integer> collidingWith = ColChecker.isColliding(
             BoxTracker.getBox(CHECKBOX, SpriteTracker.playerID), BoxTracker.getBoxes(WORLDBOX)
         );
-        if (!collidingWith.isEmpty()) PlayerMvmnt.forceState(MvState.STOPPED);
+        if (!collidingWith.isEmpty() || !isInWorldBounds(SpriteTracker.playerID)) PlayerMvmnt.forceState(MvState.STOPPED);
         else PlayerMvmnt.runMvmnt();
 
         // Run NPC Movement
@@ -76,7 +84,7 @@ public class WorldData {
     }
 
     public static void removeSprite(int spriteID) {
-        bg.getChildren().remove(SpriteTracker.allSprites.get(spriteID).getGroup());
+        bg.getGroup().getChildren().remove(SpriteTracker.allSprites.get(spriteID).getGroup());
         SpriteTracker.removeSprite(SpriteTracker.allSprites.get(spriteID));
     }
 
@@ -89,5 +97,11 @@ public class WorldData {
     public static void openStorageInteraction(int interactorID, int interactableID) {
         Menus.dispStorageInteraction(
                 StorageTracker.storages.get(interactorID), StorageTracker.storages.get(interactableID));
+    }
+
+//WORLD-BOUNDS-----------------------------------------------------------------------------------------------------------
+
+    public static boolean isInWorldBounds(int checkBoxID) {
+        return bg.getWorldBox().getBounds().contains(BoxTracker.getBox(CHECKBOX, checkBoxID).getBounds());
     }
 }

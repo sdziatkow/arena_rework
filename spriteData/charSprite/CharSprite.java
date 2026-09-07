@@ -23,6 +23,7 @@ public class CharSprite extends MovingSprite implements Hurtable {
     }
 
     private void setUp(String pathToSheet) {
+        setMaxSpeed(1.5);
         npcState = NPCState.FREE;
         addBox(new CollisionBox(WORLDBOX));
         addBox(new CollisionBox(HURTBOX));

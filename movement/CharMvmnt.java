@@ -14,8 +14,8 @@ import values.DoubleVal;
  * @see NPCState
  */
 public abstract class CharMvmnt {
-    public static double acceleration = 0.24;
-    public static double friction = 0.12;
+    public static double acceleration = 1.05;
+    public static double friction = 0.22;
 
     public static void onMove(CharSprite sprite) {
         accel(sprite.getSpeed());
