@@ -10,9 +10,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import menus.Menus;
 import movement.CharMvmnt;
+import tileSet.TileSetMaker;
 import worldData.WorldData;
 import worldData.objectData.SpriteTracker;
 import worldData.statData.StatTracker;
+import worldStage.WorldMaker;
 import worldStage.WorldStage;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -23,16 +25,16 @@ public class Main extends Application {
 
     /** Runs before start **/
     public void init() {
-        WorldStage world = new WorldStage();
+        WorldStage world = WorldMaker.makeWorld(TileSetMaker.makeTileSet("resources/object_data/tile_set_data/grass_area.txt"));
         WorldData.bg = world.getWorld();
-        WorldData.bg.getChildren().add(Menus.overlay);
-        WorldData.bg.setCache(true);
+        WorldData.bg.getGroup().getChildren().add(Menus.overlay);
+        WorldData.bg.getGroup().setCache(true);
     }
 
     @Override
     public void start(Stage stage) {
         final Stage s = stage;
-        Scene sc = new Scene(WorldData.bg, 3000, 3000, true);
+        Scene sc = new Scene(WorldData.bg.getGroup(), 3000, 3000, true);
         sc.setCamera(cam);
         cam.setCache(true);
         Menus.overlay.getChildren().add(cam);
@@ -75,13 +77,12 @@ public class Main extends Application {
         });
 
         s.setTitle("WASTE");
-        s.setWidth(500.0);
-        s.setHeight(500.0);
+        s.setWidth(1000.0);
+        s.setHeight(800.0);
         s.show();
 
     //TESTING------------------------------------------------------------------------------------------------------------
-
-        SpriteTracker.combatSprites.get(SpriteTracker.playerID).getSpeed().setMax(1.7);
+        SpriteTracker.charSprites.get(SpriteTracker.playerID).setMaxSpeed(2.0);
         StatTracker.gameChars.get(SpriteTracker.playerID).lvl().incAttrPoints();
 
         Timer gameTimer = new Timer();

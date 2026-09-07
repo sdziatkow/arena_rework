@@ -5,8 +5,6 @@ import charData.stat.Stat;
 import collision.ColType;
 import control.IDGen;
 import itemData.Item;
-import itemData.weapons.Weapon;
-import javafx.scene.Group;
 import menus.statBar.StatBar;
 import movement.PlayerMvmnt;
 import spriteData.backgroundSprite.PickableSprite;
@@ -17,62 +15,30 @@ import spriteData.charSprite.CharSprite;
 import spriteData.charSprite.CombatSprite;
 import storageData.EQSlots;
 import storageData.Storage;
+import tileSet.TileSet;
 import worldData.objectData.MvmntTracker;
 import worldData.objectData.SpriteTracker;
 import worldData.statData.StatTracker;
 import worldData.statData.StorageTracker;
 import worldStage.loading.GameCharGen;
-import worldStage.loading.ItemGen;
-import worldStage.loading.StaticSpriteGen;
 
 /** For instantiating Arena Objects and creating a playable world space. */
 public class WorldStage {
-    private Group world;
+    private TileSet world;
+    public int[] spawn;
 
-    public WorldStage() {
-        world = new Group();
+    public WorldStage(TileSet tileSet, int[] spawnPoint) {
+        world = tileSet;
+        spawn = spawnPoint;
 
         int playerID = addChar(
                 GameCharGen.genChar("resources/object_data/char_data/default_char.txt"),
-                new int[]{100, 100},
+                new int[]{spawn[0], spawn[1]},
                 null,
                 false,
                 false
         );
         setUpPlayer(playerID);
-
-        addChar(
-            GameCharGen.genChar("resources/object_data/char_data/log.txt"),
-                new int[]{100, 200},
-                null,
-                false,
-                true
-        );
-
-        addChar(GameCharGen.genChar("resources/object_data/char_data/test_enemy.txt"),
-                new int[]{100, 300},
-                null,
-                true,
-                true
-        );
-
-        addStaticSprite(
-            StaticSpriteGen.genStaticSprite("resources/object_data/bg_sprite_data/stone_tower.txt"),
-            new int[]{200, 100}
-        );
-
-        addStorage(
-                new StorageSprite("file:resources/sprites/bg_sprites/chest/open_1x3_20x20.png"),
-                null,
-                new int[]{50, 50}
-        );
-
-        addItemNoStorage(
-            ItemGen.genItem("resources/object_data/item_data/wpn_data/steel_sword.txt", new Weapon()),
-            1,
-            new int[]{50, 100}
-        );
-        setUpStatBars();
     }
 
     public void setUpStatBars() {
@@ -134,7 +100,7 @@ public class WorldStage {
 
         if (items != null) fillStorage(backpack, items);
 
-        world.getChildren().add(sprite.getGroup());
+        world.getGroup().getChildren().add(sprite.getGroup());
         sprite.setPos(pos[0], pos[1]);
 //        sprite.getWorldBox().getColBox().setOpacity(1);
 //        sprite.getCheckBox().getColBox().setOpacity(1);
@@ -156,7 +122,7 @@ public class WorldStage {
         sprite.setID(ID);
         SpriteTracker.trackSprite(sprite);
 
-        world.getChildren().add(sprite.getGroup());
+        world.getGroup().getChildren().add(sprite.getGroup());
         sprite.setPos(pos[0], pos[1]);
 //        sprite.getWorldBox().getColBox().setOpacity(1);
         return ID;
@@ -183,11 +149,11 @@ public class WorldStage {
 
         if (items != null) fillStorage(storage, items);
 
-        world.getChildren().add(sprite.getGroup());
+        world.getGroup().getChildren().add(sprite.getGroup());
         sprite.setPos(pos[0], pos[1]);
 
-        sprite.getBox(ColType.WORLDBOX).getColBox().setOpacity(1);
-        sprite.getBox(ColType.INTERACTBOX).getColBox().setOpacity(1);
+        //sprite.getBox(ColType.WORLDBOX).getColBox().setOpacity(1);
+        //sprite.getBox(ColType.INTERACTBOX).getColBox().setOpacity(1);
         return ID;
     }
 
@@ -215,7 +181,7 @@ public class WorldStage {
         idleSprite.setID(ID);
         SpriteTracker.trackSprite(idleSprite);
 
-        world.getChildren().add(idleSprite.getGroup());
+        world.getGroup().getChildren().add(idleSprite.getGroup());
         idleSprite.setPos(pos[0], pos[1]);
         return ID;
     }
@@ -228,5 +194,5 @@ public class WorldStage {
         }
     }
 
-    public Group getWorld() {return world;}
+    public TileSet getWorld() {return world;}
 }

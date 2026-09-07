@@ -45,7 +45,8 @@ public class CollisionBox {
     }
 
     private void setUp() {
-
+        colBox.setOpacity(0);
+        colBox.setCache(true);
         colBox.setFill(Color.TRANSPARENT);
 
         // Give each collision box a different color for testing purposes.
@@ -74,16 +75,15 @@ public class CollisionBox {
             case WORLDBOX:
                 colBox.setStroke(Color.BLACK);
                 colBox.setStrokeWidth(4);
+                //colBox.setOpacity(1);
                 break;
             case CHECKBOX:
                 colBox.setStroke(Color.GREEN);
                 colBox.setStrokeWidth(3);
+                //colBox.setOpacity(1);
                 break;
 
         }
-
-        colBox.setOpacity(0);
-        colBox.setCache(true);
     }
 
 //SETTERS----------------------------------------------------------------------------------------------------------------

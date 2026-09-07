@@ -1,5 +1,6 @@
 package movement;
 
+import javafx.geometry.Bounds;
 import javafx.scene.shape.Path;
 import spriteData.Dir;
 
@@ -10,6 +11,9 @@ public class PathFinder extends CharMvmnt{
 
     public static double absDist(double x, double tx) { return Math.abs(Math.abs(x) - Math.abs(tx)); }
     public static double rawDist(double x, double tx) {return (x - tx);}
+    public static double distanceTo(double[] pos1, double[] pos2) {
+        return Math.sqrt(Math.pow((pos1[0] - pos2[0]), 2) + Math.pow((pos1[1] - pos2[1]), 2));
+    }
 
 
     /** Must give values relating to the y-axis.
@@ -39,7 +43,7 @@ public class PathFinder extends CharMvmnt{
 
         // Determine the best direction.
         Dir best;
-        if (yDist <= xDist) {
+        if (yDist < xDist) {
             if (isEast(x, tx)) best = Dir.E;
             else best = Dir.W;
         }
@@ -50,32 +54,33 @@ public class PathFinder extends CharMvmnt{
         return best;
     }
 
-    /** Will return the direction in which the least amount of distance between the two points needs to be covered */
-    public static Dir bestMoveAround(Dir dir, double[] pos, double[] boxBounds) {
+    /** Will return the opposite of the direction in which the least amount of distance between the two points needs to be covered */
+    public static Dir bestMoveAround(double[] pos, Bounds boxBounds) {
         double x = pos[0];
         double y = pos[1];
-        double bx = boxBounds[0];
-        double by = boxBounds[1];
-
-        // We want the largest distance from the mid-point, go that way.
-        double xDist = absDist(x, bx);
-        double yDist = absDist(y, by);
-
-        if (Dir.axis(dir) == 0) { // This means coming from east or west moving towards a box.
-            if (isSouth(y, by)) { // This I should go north.
-                return Dir.N;
-            }
-            else { // Otherwise go south.
-                return Dir.S;
-            }
+        double xDist;
+        double yDist;
+        boolean isSouth = false;
+        boolean isEast = false;
+        if (isSouth(y, boxBounds.getCenterY())) { // Box is south of me.
+            yDist = absDist(y, boxBounds.getMaxY()); // Get dist to maxY (bottom-most), furthest from me.
+            isSouth = true;
         }
-        else { // This means coming from north or south moving towards a box.
-            if (isEast(x, bx)) { // This means I should go west.
-                return Dir.W;
-            }
-            else { // Otherwise go east.
-                return Dir.E;
-            }
+        else yDist = absDist(y, boxBounds.getMinY()); // Otherwise get dist to minY(top-most), furthest from me.
+
+        if (isEast(x, boxBounds.getCenterX())) { // Box is east of me.
+            xDist = absDist(x, boxBounds.getMaxX()); // Get dist to maxX (right-most), furthest from me.
+            isEast = true;
+        }
+        else xDist = absDist(x, boxBounds.getMinX());// Otherwise get dist to minX (left-most), furthest from me.
+
+        if (xDist < yDist) { // Least distance to cover x-wise.
+            if (isEast) return Dir.W;
+            else return Dir.E;
+        }
+        else {
+            if (isSouth) return Dir.N;
+            else return Dir.S;
         }
     }
 }
