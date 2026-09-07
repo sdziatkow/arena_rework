@@ -7,10 +7,12 @@ import menus.statBar.StatBar;
 import movement.NPCState;
 import spriteData.MovingSprite;
 import spriteData.behavior.boxes.Hurtable;
+import spriteData.behavior.boxes.Interactable;
+import worldData.WorldData;
 
 import static collision.ColType.*;
 
-public class CharSprite extends MovingSprite implements Hurtable {
+public class CharSprite extends MovingSprite implements Hurtable, Interactable {
     private NPCState npcState;
     private StatBar statBar;
 
@@ -54,5 +56,10 @@ public class CharSprite extends MovingSprite implements Hurtable {
     public void onHurt(int attkID) {
         AttkHandler.handleAttk(attkID, getID());
         statBar.updateProgress();
+    }
+
+    @Override
+    public void onInteract(int interactorID) {
+        WorldData.openDialogueMenu(getID());
     }
 }

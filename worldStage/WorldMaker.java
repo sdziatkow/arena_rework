@@ -1,5 +1,6 @@
 package worldStage;
 
+import dialogue.DialogueMaker;
 import itemData.weapons.Weapon;
 import spriteData.backgroundSprite.StorageSprite;
 import tileSet.TileSet;
@@ -16,12 +17,14 @@ public class WorldMaker {
                 GameCharGen.genChar("resources/object_data/char_data/log.txt"),
                 new int[]{spawn[0], spawn[1] + 100},
                 null,
+                DialogueMaker.makeDialogue("resources/object_data/char_data/dialogue/log.txt"),
                 false,
                 true
         );
 
         world.addChar(GameCharGen.genChar("resources/object_data/char_data/test_enemy.txt"),
-                new int[]{spawn[0], spawn[1] + 200},
+                new int[]{spawn[0], spawn[1] + 400},
+                null,
                 null,
                 true,
                 true

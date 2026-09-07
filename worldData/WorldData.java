@@ -4,6 +4,7 @@ import collision.ColChecker;
 import collision.ColType;
 import control.AttkHandler;
 import control.ViewHelper;
+import dialogue.Dialogue;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.ParallelCamera;
@@ -16,6 +17,7 @@ import tileSet.TileSet;
 import worldData.objectData.BoxTracker;
 import worldData.objectData.MvmntTracker;
 import worldData.objectData.SpriteTracker;
+import worldData.statData.DialogueTracker;
 import worldData.statData.StatTracker;
 import worldData.statData.StorageTracker;
 
@@ -97,6 +99,13 @@ public class WorldData {
     public static void openStorageInteraction(int interactorID, int interactableID) {
         Menus.dispStorageInteraction(
                 StorageTracker.storages.get(interactorID), StorageTracker.storages.get(interactableID));
+    }
+
+    public static void openDialogueMenu(Integer dialogueID) {
+        Dialogue d = DialogueTracker.dialogues.get(dialogueID);
+        if (d != null) {
+            System.out.println(d.speak());
+        }
     }
 
 //WORLD-BOUNDS-----------------------------------------------------------------------------------------------------------

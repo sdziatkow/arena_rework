@@ -2,8 +2,11 @@ package worldStage;
 
 import charData.GameChar;
 import charData.stat.Stat;
+import collision.BoxSizer;
 import collision.ColType;
+import collision.CollisionBox;
 import control.IDGen;
+import dialogue.Dialogue;
 import itemData.Item;
 import menus.statBar.StatBar;
 import movement.PlayerMvmnt;
@@ -18,6 +21,7 @@ import storageData.Storage;
 import tileSet.TileSet;
 import worldData.objectData.MvmntTracker;
 import worldData.objectData.SpriteTracker;
+import worldData.statData.DialogueTracker;
 import worldData.statData.StatTracker;
 import worldData.statData.StorageTracker;
 import worldStage.loading.GameCharGen;
@@ -34,6 +38,7 @@ public class WorldStage {
         int playerID = addChar(
                 GameCharGen.genChar("resources/object_data/char_data/default_char.txt"),
                 new int[]{spawn[0], spawn[1]},
+                null,
                 null,
                 false,
                 false
@@ -72,9 +77,10 @@ public class WorldStage {
      * @param gameChar The gameChar to be added to the world.
      * @param pos The position of this gameChar's spriteGroup within the world group.
      * @param items The items to store in the gameChar's Storage.
+     * @param d Given Dialogue Object relating to this GameChar. Can be given null if it has no dialogue.
      * @return The gameCharacter's ID.
      */
-    public int addChar(GameChar gameChar, int[] pos, Item[] items, boolean isHostile, boolean isNPC) {
+    public int addChar(GameChar gameChar, int[] pos, Item[] items, Dialogue d, boolean isHostile, boolean isNPC) {
         final int ID = IDGen.genID();
         gameChar.setID(ID);
         CharSprite sprite;
@@ -83,7 +89,8 @@ public class WorldStage {
             sprite = new CombatSprite(gameChar.getPathToMvSheet(), gameChar.getPathToAttkSheet());
             ((CombatSprite)sprite).getWPSprite().setID(ID);
             if (isHostile) SpriteBehavior.enableHostility((CombatSprite)sprite);
-        }else sprite = new CharSprite(gameChar.getPathToMvSheet());
+        }
+        else sprite = new CharSprite(gameChar.getPathToMvSheet());
 
         Storage backpack = new Storage();
         EQSlots eqSlots = new EQSlots();
@@ -92,13 +99,16 @@ public class WorldStage {
         backpack.setID(ID);
         eqSlots.setID(ID);
 
-        SpriteTracker.trackSprite(sprite);
         StatTracker.trackGameChar(gameChar);
         StorageTracker.trackStorage(backpack);
         StorageTracker.trackEQSlots(eqSlots);
         if (isNPC) MvmntTracker.trackMvmnt(sprite);
 
         if (items != null) fillStorage(backpack, items);
+        if (d != null) { // Has dialogue.
+            SpriteBehavior.enableDialogue(sprite, d);
+        }
+        SpriteTracker.trackSprite(sprite);
 
         world.getGroup().getChildren().add(sprite.getGroup());
         sprite.setPos(pos[0], pos[1]);

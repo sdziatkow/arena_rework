@@ -147,7 +147,6 @@ public class NPCMvmnt {
             nextMove = PathFinder.bestMoveTowards(myMidPos, boxMidPos);
             cmbtMvCount.reset();
         }
-        System.out.println(PathFinder.distanceTo(myMidPos, boxMidPos));
         if (PathFinder.distanceTo(myMidPos, boxMidPos) < 20.0) {
             cmbtMvCount.reset();
             cmbtMvCount.setMax(1);

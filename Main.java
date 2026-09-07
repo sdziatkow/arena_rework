@@ -82,7 +82,7 @@ public class Main extends Application {
         s.show();
 
     //TESTING------------------------------------------------------------------------------------------------------------
-        SpriteTracker.charSprites.get(SpriteTracker.playerID).setMaxSpeed(2.0);
+        SpriteTracker.charSprites.get(SpriteTracker.playerID).setMaxSpeed(1.5);
         StatTracker.gameChars.get(SpriteTracker.playerID).lvl().incAttrPoints();
 
         Timer gameTimer = new Timer();
