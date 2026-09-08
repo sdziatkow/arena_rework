@@ -5,10 +5,12 @@ import control.ArenaObject;
 import java.util.Objects;
 
 public class ItemData extends ArenaObject {
+    private Boolean equipped;
     private Integer storageID;
     private String pathToPickableSprite;
 
     public ItemData() {
+        equipped = false;
         storageID = null;
         pathToPickableSprite = null;
     }
@@ -24,4 +26,7 @@ public class ItemData extends ArenaObject {
 
     /** @return Interactable PickableSprite for inventory display and when not in storage */
     public String getPathToPickableSprite(){return pathToPickableSprite;}
+
+    public boolean isEquipped() {return equipped;}
+    public void toggleEquipped(Boolean b) {equipped = b;}
 }
