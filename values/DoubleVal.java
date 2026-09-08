@@ -1,17 +1,24 @@
 package values;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+
 public class DoubleVal {
     private double min;
     private double max;
     private double val;
+    private DoubleProperty progressVal;
 
     public DoubleVal() {
+        progressVal = new SimpleDoubleProperty(0);
         min = 0;
         max = 1;
         val = 0;
     }
 
     public DoubleVal(double min, double max, double val) {
+        progressVal = new SimpleDoubleProperty(0);
         this.max = 1;
         setMin(min);
         setMax(max);
@@ -26,6 +33,7 @@ public class DoubleVal {
     public void setMax(double v) {
         validateMax(v);
         max = v;
+        progressVal.set(val / max);
     }
 
     /** Set this value to its minimum value. */
@@ -33,6 +41,7 @@ public class DoubleVal {
     public void set(double v) {
         if (v < min) val = min;
         else val = Math.min(v, max);
+        progressVal.set(val / max);
     }
     public void inc()         { set(val + 1.0);    }
     public void inc(double amnt) { set(val + amnt); }
@@ -61,4 +70,6 @@ public class DoubleVal {
         out += " |";
         return out;
     }
+
+    public DoubleProperty getProgressVal() {return progressVal;}
 }

@@ -55,7 +55,6 @@ public class CharSprite extends MovingSprite implements Hurtable, Interactable {
     @Override
     public void onHurt(int attkID) {
         AttkHandler.handleAttk(attkID, getID());
-        statBar.updateProgress();
     }
 
     @Override

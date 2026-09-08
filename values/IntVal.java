@@ -1,18 +1,24 @@
 package values;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+
 public class IntVal {
     private int min;
     private int max;
     private int val;
+    private IntegerProperty progressVal;
 
     /** Default min = 0; max = 1; val = 0; */
     public IntVal() {
         min = 0;
         max = 1;
         val = 0;
+        progressVal = new SimpleIntegerProperty(0);
     }
 
     public IntVal(int min, int max, int val) {
+        progressVal = new SimpleIntegerProperty(0);
         this.max = 1;
         setMin(min);
         setMax(max);
@@ -27,6 +33,7 @@ public class IntVal {
     public void setMax(int v) {
         validateMax(v);
         max = v;
+        progressVal.set(val / max);
     }
 
     /** Set this value to its minimum value. */
@@ -34,6 +41,7 @@ public class IntVal {
     public void set(int v) {
         if (v < min) val = min;
         else val = Math.min(v, max); // If v is greater than max, set val to max.
+        progressVal.set(val / max);
     }
 
     public void inc()         { set(val + 1);    }
@@ -63,4 +71,6 @@ public class IntVal {
         out += " |";
         return out;
     }
+
+    public IntegerProperty getProgressVal() {return progressVal;}
 }

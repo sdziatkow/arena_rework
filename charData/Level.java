@@ -1,6 +1,8 @@
 package charData;
 
 import charData.attr.Attr;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import values.IntVal;
 
 /** A representation of a game character's Level and its values.
@@ -13,11 +15,13 @@ public class Level {
     private double toNext;
     private int lvl;
     private int attrPoints;
+    private DoubleProperty progressVal;
 
     public Level() {
         xp = 0.0;
         toNext = DEFAULT_TO_NEXT;
         lvl = 0;
+        progressVal = new SimpleDoubleProperty(xp / toNext);
     }
 
 //GETTERS----------------------------------------------------------------------------------------------------------------
@@ -39,12 +43,14 @@ public class Level {
     public void incXp() {
         ++xp;
         if (canLvlUp()) lvlUp();
+        progressVal.set(xp / toNext);
     }
 
     /** Increment xp by given amount and level up if possible. */
     public void incXp(double amnt) {
         xp += amnt;
         if (canLvlUp()) lvlUp();
+        progressVal.set(xp / toNext);
     }
 
     /** Increment level by 1. */
@@ -68,6 +74,7 @@ public class Level {
         ++lvl;
         ++attrPoints;
         toNext = (DEFAULT_TO_NEXT + toNext) * 1.13;
+        progressVal.set(xp / toNext);
     }
 
     @Override
@@ -78,4 +85,5 @@ public class Level {
         return out;
     }
 
+    public DoubleProperty getProgressVal() {return progressVal;}
 }

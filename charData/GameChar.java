@@ -104,8 +104,10 @@ public class GameChar extends CharData {
 
         info.add("LEVEL");
         info.add(String.valueOf(lvl.getLvl()));
+        info.add("XP");
+        info.add(String.valueOf((int)lvl.getXp()));
         info.add("TO-NEXT");
-        info.add((int)lvl.getToNext() - (int)lvl.getXp() + "xp");
+        info.add((int)lvl.getToNext() - (int)lvl.getXp() + "XP");
 
         info.add("GOLD");
         info.add(String.valueOf(gold.get()));

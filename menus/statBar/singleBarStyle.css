@@ -17,11 +17,14 @@
 }
 
 .HP {
-    -fx-accent: red;
+    -fx-accent: rgba(255, 50, 50, 0.8);
 }
 .SP {
-    -fx-accent: green;
+    -fx-accent: rgba(0, 255, 100, 0.8);
 }
 .MP {
-    -fx-accent: blue;
+    -fx-accent: rgba(50, 100, 255, 0.8);
+}
+.XP {
+    -fx-accent: rgba(255, 150, 255, 0.8);
 }

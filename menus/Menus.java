@@ -5,6 +5,7 @@ import charData.Level;
 import charData.attr.CharAttr;
 import charData.stat.CharStats;
 import itemData.Item;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -18,8 +19,10 @@ import javafx.scene.layout.GridPane;
 import menus.gameCharDisp.AttrMenu;
 import menus.gameCharDisp.CharMenu;
 import menus.gameCharDisp.StatMenu;
+import menus.statBar.StatBarDisp;
 import menus.storageDisp.StorageMenu;
 import storageData.Storage;
+import values.DoubleVal;
 
 public class Menus {
     private static final GridPane menuSpace = new GridPane();
@@ -144,6 +147,16 @@ public class Menus {
         m2.addBtnToItemDisp(take);
         menuSpace.add(m1.main, 0, 0);
         menuSpace.add(m2.main, 0, 1);
+    }
+
+//STAT-BARS--------------------------------------------------------------------------------------------------------------
+
+    public static void addOverlayStatBars(DoubleProperty hp, DoubleProperty sp, DoubleProperty xp) {
+        StatBarDisp s = new StatBarDisp(hp, sp, xp);
+        s.getContainer().setTranslateY(5.0);
+        s.getContainer().setTranslateX(-5.0);
+        overlay.getChildren().add(s.getContainer());
+
     }
 
 }

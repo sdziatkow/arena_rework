@@ -8,6 +8,7 @@ import collision.CollisionBox;
 import control.IDGen;
 import dialogue.Dialogue;
 import itemData.Item;
+import menus.Menus;
 import menus.statBar.StatBar;
 import movement.PlayerMvmnt;
 import spriteData.backgroundSprite.PickableSprite;
@@ -48,10 +49,17 @@ public class WorldStage {
 
     public void setUpStatBars() {
         SpriteTracker.charSprites.forEach((Integer id, CharSprite sprite) -> {
-//            if (id != SpriteTracker.playerID) {
-                StatBar bar = new StatBar(Stat.HP, StatTracker.gameChars.get(id).stats().get(Stat.HP));
+            if (id != SpriteTracker.playerID) {
+                StatBar bar = new StatBar(Stat.HP, StatTracker.gameChars.get(id).stats().get(Stat.HP).getProgressVal());
                 sprite.setStatBar(bar);
-//            }
+            }
+            else {
+                Menus.addOverlayStatBars(
+                        StatTracker.gameChars.get(id).stats().get(Stat.HP).getProgressVal(),
+                        StatTracker.gameChars.get(id).stats().get(Stat.SP).getProgressVal(),
+                        StatTracker.gameChars.get(id).lvl().getProgressVal()
+                );
+            }
         });
     }
 
