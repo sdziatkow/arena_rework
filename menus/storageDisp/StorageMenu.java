@@ -6,6 +6,8 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -15,8 +17,11 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import spriteData.FrameGen;
 import storageData.Storage;
+import worldData.WorldData;
 
 import java.util.ArrayList;
+import java.util.Locale;
+import java.util.Objects;
 
 public class StorageMenu {
     public GridPane main;
@@ -70,7 +75,7 @@ public class StorageMenu {
 
 //CONSTRUCTOR------------------------------------------------------------------------------------------------------------
 
-    public StorageMenu(Storage s) {
+    public StorageMenu(Storage s, boolean useEQBtn) {
         stg = s;
         main = new GridPane();
         typeList = new ListView<>();
@@ -78,6 +83,25 @@ public class StorageMenu {
         itemDisp = new GridPane();
         itemBtns = new ArrayList<Button>();
         setUpTypeList();
+        if (useEQBtn) {
+            Button eqBtn = new Button();
+            eqBtn.setId("eq");
+            EventHandler<ActionEvent> onEq = new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent actionEvent) {
+                    String src = ((Button) actionEvent.getSource()).getText();
+                    if (src.toLowerCase(Locale.ROOT).equals("equip")) {
+                        WorldData.eqItemFromOwnStorage(stg.getID(), stg.grabByName(selectedItem).getID());
+                        ((Button) actionEvent.getSource()).setText("UN-EQUIP");
+                    } else if (src.toLowerCase(Locale.ROOT).equals("un-equip")) {
+                        WorldData.unEqItemFromOwnStorage(stg.getID(), stg.grabByName(selectedItem).getID());
+                        ((Button) actionEvent.getSource()).setText("EQUIP");
+                    }
+                }
+            };
+            eqBtn.setOnAction(onEq);
+            addBtnToItemDisp(eqBtn);
+        }
     }
 
     public void reset() {
@@ -134,7 +158,18 @@ public class StorageMenu {
             itemDisp.add(new Label(dispInfo.get(n)), n % 2, n / 2);
         }
         for (int n = 0; n < itemBtns.size(); ++n) {
-            itemDisp.add(itemBtns.get(n), 0, itemDisp.getRowCount(), 2, 1);
+            Button btn = itemBtns.get(n);
+            if (Objects.equals(btn.getId(), "eq")) {
+                if (i.isEquipped()) btn.setText("UN-EQUIP");
+                else btn.setText("EQUIP");
+            }
+            if (Objects.equals(btn.getId(), "interaction")) {
+                if (i.isEquipped()) {
+                    btn.setText("EQUIPPED");
+                    btn.setDisable(true);
+                }
+            }
+            itemDisp.add(btn, 0, itemDisp.getRowCount(), 2, 1);
         }
     }
 

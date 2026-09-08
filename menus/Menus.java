@@ -84,7 +84,7 @@ public class Menus {
     }
 
     public static void dispStorage(Storage s) {
-        StorageMenu menu = new StorageMenu(s);
+        StorageMenu menu = new StorageMenu(s, true);
         menuSpace.add(menu.main, menuSpace.getColumnCount(), menuSpace.getRowCount());
     }
 
@@ -107,10 +107,12 @@ public class Menus {
 
     public static void dispStorageInteraction(Storage interactor, Storage interactable) {
         if (!menuSpace.getChildren().isEmpty()) clearMenus();
-        StorageMenu m1 = new StorageMenu(interactor);
-        StorageMenu m2 = new StorageMenu(interactable);
+        StorageMenu m1 = new StorageMenu(interactor, false);
+        StorageMenu m2 = new StorageMenu(interactable, false);
         Button put = new Button("Put");
         Button take = new Button("Take");
+        put.setId("interaction");
+        take.setId("interaction");
         EventHandler<ActionEvent> onMove = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {

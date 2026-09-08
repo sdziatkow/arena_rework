@@ -1,5 +1,6 @@
 package spriteData.charSprite;
 
+import collision.ColType;
 import javafx.animation.KeyFrame;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -32,16 +33,23 @@ public class CombatSprite extends CharSprite implements Combatant {
         setUp(attkSheet);
     }
 
+    private WeaponSprite defaultWPSprite(){
+        return new WeaponSprite("file:resources/sprites/wpns/nothing_4x4_32x32.png");
+    }
+
     private void setUp(String attkSheet) {
         attkSprite = new WeaponSprite(attkSheet);
-        wpSprite = new WeaponSprite("file:resources/sprites/wpns/nothing_4x4_32x32.png");
+        wpSprite = defaultWPSprite();
 
         getPane().getChildren().add(attkSprite.getFrame());
         getPane().getChildren().add(wpSprite.getGroup());
 
         attkSprite.getFrame().setVisible(false);
         wpSprite.getFrame().setVisible(false);
+        setUpWPAnim();
+    }
 
+    private void setUpWPAnim() {
         EventHandler<ActionEvent> onAttkAnimEnd = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -86,7 +94,16 @@ public class CombatSprite extends CharSprite implements Combatant {
     }
 
     @Override
-    public void setWPSprite(WeaponSprite s) { wpSprite = s;}
+    public void clearWPSprite() {setWPSprite(defaultWPSprite());}
+
+    @Override
+    public void setWPSprite(WeaponSprite s) {
+        wpSprite.getAllFrames()[0] = s.getAllFrames()[0];
+        wpSprite.getAllFrames()[1] = s.getAllFrames()[1];
+        wpSprite.getAllFrames()[2] = s.getAllFrames()[2];
+        wpSprite.getAllFrames()[3] = s.getAllFrames()[3];
+        wpSprite.addBox(s.getBox(HITBOX));
+    }
 
     @Override
     public WeaponSprite getWPSprite() { return wpSprite; }
