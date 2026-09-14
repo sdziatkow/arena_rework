@@ -6,6 +6,9 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import values.DoubleVal;
 
+import static values.ValType.MAX;
+import static values.ValType.VAL;
+
 public class StatMenu {
 
     public GridPane main;
@@ -33,27 +36,30 @@ public class StatMenu {
 
     private void setUpStatDisp() {
         statDisp.getChildren().clear();
-        Stat[] info = Stat.getStats();
-        DoubleVal currStat;
+        Stat[] info = Stat.ALL;
         for (int i = 0; i < info.length; ++i) {
-            currStat = stats.get(info[i]);
+            double statVal = stats.get(info[i], VAL);
             Label key = new Label(info[i].toString());
             key.getStyleClass().add("stat-key-label");
 
-            Label val = new Label(String.valueOf(currStat.get()));
+            Label val = new Label(String.format("%.2f", statVal));
             val.getStyleClass().add("stat-val-label");
 
             statDisp.add(key, 0, i);
             statDisp.add(val, 1, i);
 
-            if (info[i].equals(Stat.HP) || info[i].equals(Stat.SP)) {
+            if (Stat.isVital(info[i])) {
                 Label div = new Label("/");
                 div.getStyleClass().add("stat-div-label");
 
-                Label max = new Label(String.valueOf(currStat.getMax()));
+                double statMax = stats.get(info[i], MAX);
+                Label max = new Label(String.format("%.2f", statMax));
                 max.getStyleClass().add("stat-max-label");
                 statDisp.add(div, 2, i);
                 statDisp.add(max, 3, i);
+            }
+            if (info[i].equals(Stat.CRIT) || info[i].equals(Stat.DODGE)) {
+                val.setText(String.format("%.2f%%", statVal * 100));
             }
         }
     }

@@ -1,4 +1,4 @@
-package worldData.objectData;
+package control.runtimeTrackers.spriteData;
 
 import movement.npcMvmnt.NPCMvmnt;
 import spriteData.charSprite.CharSprite;

@@ -1,4 +1,4 @@
-package worldData.objectData;
+package control.runtimeTrackers.spriteData;
 
 import collision.ColType;
 import collision.CollisionBox;

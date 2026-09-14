@@ -2,12 +2,11 @@ package worldStage;
 
 import charData.GameChar;
 import charData.stat.Stat;
-import collision.BoxSizer;
-import collision.ColType;
-import collision.CollisionBox;
 import control.IDGen;
+import control.handlers.StatChangeHandler;
 import dialogue.Dialogue;
 import itemData.Item;
+import menus.Menus;
 import menus.statBar.StatBar;
 import movement.PlayerMvmnt;
 import spriteData.backgroundSprite.PickableSprite;
@@ -19,12 +18,11 @@ import spriteData.charSprite.CombatSprite;
 import storageData.EQSlots;
 import storageData.Storage;
 import tileSet.TileSet;
-import worldData.objectData.MvmntTracker;
-import worldData.objectData.SpriteTracker;
-import worldData.statData.DialogueTracker;
-import worldData.statData.StatTracker;
-import worldData.statData.StorageTracker;
-import worldStage.loading.GameCharGen;
+import control.runtimeTrackers.spriteData.MvmntTracker;
+import control.runtimeTrackers.spriteData.SpriteTracker;
+import control.runtimeTrackers.worldData.StatTracker;
+import control.runtimeTrackers.worldData.StorageTracker;
+import control.objectGen.GameCharGen;
 
 /** For instantiating Arena Objects and creating a playable world space. */
 public class WorldStage {
@@ -36,7 +34,7 @@ public class WorldStage {
         spawn = spawnPoint;
 
         int playerID = addChar(
-                GameCharGen.genChar("resources/object_data/char_data/default_char.txt"),
+                GameCharGen.genChar("resources/object_data/char_data/classes/default_brute.txt"),
                 new int[]{spawn[0], spawn[1]},
                 null,
                 null,
@@ -48,10 +46,18 @@ public class WorldStage {
 
     public void setUpStatBars() {
         SpriteTracker.charSprites.forEach((Integer id, CharSprite sprite) -> {
-//            if (id != SpriteTracker.playerID) {
-                StatBar bar = new StatBar(Stat.HP, StatTracker.gameChars.get(id).stats().get(Stat.HP));
+            if (id != SpriteTracker.playerID) {
+                StatBar bar = new StatBar(Stat.HP, StatTracker.gameChars.get(id).stats().progressVal(Stat.HP));
                 sprite.setStatBar(bar);
-//            }
+            }
+            else {
+                Menus.addOverlayStatBars(
+                        StatTracker.gameChars.get(id).stats().progressVal(Stat.HP),
+                        StatTracker.gameChars.get(id).stats().progressVal(Stat.MP),
+                        StatTracker.gameChars.get(id).stats().progressVal(Stat.SP),
+                        StatTracker.gameChars.get(id).lvl().getProgressVal()
+                );
+            }
         });
     }
 
@@ -110,6 +116,7 @@ public class WorldStage {
         }
         SpriteTracker.trackSprite(sprite);
 
+        StatChangeHandler.updateStatsFromAttr(ID);
         world.getGroup().getChildren().add(sprite.getGroup());
         sprite.setPos(pos[0], pos[1]);
 //        sprite.getWorldBox().getColBox().setOpacity(1);

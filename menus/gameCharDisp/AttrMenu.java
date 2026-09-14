@@ -1,20 +1,26 @@
 package menus.gameCharDisp;
 
+import charData.GameChar;
 import charData.Level;
 import charData.attr.Attr;
 import charData.attr.CharAttr;
+import control.handlers.StatChangeHandler;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import values.IntVal;
+import values.ValType;
+
+import static values.ValType.*;
 
 public class AttrMenu {
     public GridPane main;
     private Label header;
     private GridPane attrDisp;
     private GridPane btnDisp;
+    private GameChar gameChar;
     private CharAttr attr;
     private Level lvl;
 
@@ -23,14 +29,33 @@ public class AttrMenu {
     private final EventHandler<ActionEvent> onPlus = new EventHandler<ActionEvent>() {
         @Override
         public void handle(ActionEvent actionEvent) {
-            Button src = (Button)actionEvent.getSource();
-            Attr selected = Attr.valueOf(src.getId());
-            IntVal data = attr.get(selected);
-            if (lvl.getAttrPoints() > 0 && data.get() < data.getMax()) {
-                data.inc();
+            Button plus = (Button)actionEvent.getSource(); // plus btn that triggered event.
+            Button minus = null;                           // minus btn associated with same Attribute.
+
+            // Get Attr from btn's user data.
+            Attr selected = (Attr)plus.getUserData();
+
+            // Get minus button.
+            for (int i = 0; i < btnDisp.getChildren().size(); ++i) {
+                Button b = (Button)btnDisp.getChildren().get(i);
+                if (b.getUserData().equals(plus.getUserData()) && b.getText().equals("-")) {
+                    minus = b;
+                }
+            }
+            int attrVal = attr.get(selected, VAL);
+            int attrMax = attr.get(selected, MAX);
+            if (lvl.getAttrPoints() > 0 && attrVal < attrMax) {
+                attr.skillUp(selected, 1);
                 lvl.decAttrPoints();
                 setAttrDisp();
                 setAttrPointDisp();
+
+                // Increment the ID value of minus btn and enable it.
+                if (minus != null) {
+                    minus.setId(String.valueOf(Integer.parseInt(minus.getId()) + 1));
+                    minus.setDisable(false);
+                }
+                StatChangeHandler.updateStatsFromAttr(gameChar.getID());
             }
         }
     };
@@ -38,23 +63,32 @@ public class AttrMenu {
     private final EventHandler<ActionEvent> onMinus = new EventHandler<ActionEvent>() {
         @Override
         public void handle(ActionEvent actionEvent) {
-            Button src = (Button)actionEvent.getSource();
-            Attr selected = Attr.valueOf(src.getId());
-            IntVal data = attr.get(selected);
-            if (data.get() > data.getMin()) {
-                data.dec();
+            Button minus = (Button)actionEvent.getSource(); // minus btn that triggered the event.
+            Attr selected = (Attr)minus.getUserData();      // Get Attr from minus btn's user data.
+            int attrVal = attr.get(selected, VAL);
+            int attrMin = attr.get(selected, MIN);
+            if (Integer.parseInt(minus.getId()) > 0 && attrVal > attrMin) {
+                attr.skillDown(selected, 1);
                 lvl.incAttrPoints();
                 setAttrDisp();
                 setAttrPointDisp();
+
+                // Decrement minus btn's ID value. If value is zero, disable the button.
+                minus.setId(String.valueOf(Integer.parseInt(minus.getId()) - 1));
+                if (Integer.parseInt(minus.getId()) < 1) {
+                    minus.setDisable(true);
+                }
+                StatChangeHandler.updateStatsFromAttr(gameChar.getID());
             }
         }
     };
 
 //CONSTRUCTOR------------------------------------------------------------------------------------------------------------
 
-    public AttrMenu(CharAttr c, Level l) {
-        attr = c;
-        lvl = l;
+    public AttrMenu(GameChar c) {
+        gameChar = c;
+        attr = c.attr();
+        lvl = c.lvl();
         main = new GridPane();
         header = new Label();
         attrDisp = new GridPane();
@@ -79,10 +113,10 @@ public class AttrMenu {
 
     public void setAttrDisp() {
         attrDisp.getChildren().clear();
-        Attr[] info = Attr.getAttr();
+        Attr[] info = Attr.ALL;
         for (int i = 0; i < info.length; ++i) {
             Label key = new Label(info[i].toString());
-            Label val = new Label(String.valueOf(attr.get(info[i]).get()));
+            Label val = new Label(String.valueOf(attr.get(info[i], VAL)));
             key.getStyleClass().add("attr-label");
             val.getStyleClass().add("attr-label");
             key.getStyleClass().add("attr-key-label");
@@ -94,13 +128,15 @@ public class AttrMenu {
 
     public void setBtnDisp() {
         btnDisp.getChildren().clear();
-        Attr[] info = Attr.getAttr();
+        Attr[] info = Attr.ALL;
         for (int i = 0; i < info.length; ++i) {
             Button plus = new Button("+");
             Button minus = new Button("-");
-
-            plus.setId(info[i].toString());
-            minus.setId(info[i].toString());
+            minus.setDisable(true);
+            plus.setId("0");
+            minus.setId("0");
+            plus.setUserData(info[i]);
+            minus.setUserData(info[i]);
             plus.getStyleClass().add("attr-btn");
             plus.getStyleClass().add("attr-plus");
             minus.getStyleClass().add("attr-btn");

@@ -1,4 +1,4 @@
-package worldData.objectData;
+package control.runtimeTrackers.spriteData;
 
 import spriteData.Sprite;
 import spriteData.backgroundSprite.PickableSprite;

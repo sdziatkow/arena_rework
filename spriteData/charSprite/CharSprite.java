@@ -2,7 +2,7 @@ package spriteData.charSprite;
 
 import collision.BoxSizer;
 import collision.CollisionBox;
-import control.AttkHandler;
+import control.handlers.AttkHandler;
 import menus.statBar.StatBar;
 import movement.NPCState;
 import spriteData.MovingSprite;
@@ -55,7 +55,6 @@ public class CharSprite extends MovingSprite implements Hurtable, Interactable {
     @Override
     public void onHurt(int attkID) {
         AttkHandler.handleAttk(attkID, getID());
-        statBar.updateProgress();
     }
 
     @Override

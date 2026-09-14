@@ -7,7 +7,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import worldData.WorldData;
-import worldData.objectData.SpriteTracker;
+import control.runtimeTrackers.spriteData.SpriteTracker;
 
 public class Controller {
     public static final ObservableSet<KeyCode> mvmntKeysDown = FXCollections.observableSet();
@@ -28,6 +28,9 @@ public class Controller {
                 break;
             case I:
                 Platform.runLater(() -> WorldData.openPicker(SpriteTracker.playerID));
+                break;
+            case Z:
+                Platform.runLater(() -> WorldData.useEquippedUsable(SpriteTracker.playerID));
                 break;
             default: return;
         }

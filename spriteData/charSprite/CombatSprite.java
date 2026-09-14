@@ -1,6 +1,6 @@
 package spriteData.charSprite;
 
-import collision.ColType;
+import control.runtimeTrackers.spriteData.SpriteTracker;
 import javafx.animation.KeyFrame;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -94,15 +94,24 @@ public class CombatSprite extends CharSprite implements Combatant {
     }
 
     @Override
+    public void setAttkSpeed(double speed) {getAnim().setRate(speed);}
+
+    @Override
+    public double getAttkSpeed() {return getAnim().getRate();}
+
+    @Override
     public void clearWPSprite() {setWPSprite(defaultWPSprite());}
 
     @Override
     public void setWPSprite(WeaponSprite s) {
-        wpSprite.getAllFrames()[0] = s.getAllFrames()[0];
-        wpSprite.getAllFrames()[1] = s.getAllFrames()[1];
-        wpSprite.getAllFrames()[2] = s.getAllFrames()[2];
-        wpSprite.getAllFrames()[3] = s.getAllFrames()[3];
-        wpSprite.addBox(s.getBox(HITBOX));
+        SpriteTracker.removeSprite(wpSprite);
+        getPane().getChildren().remove(wpSprite.getGroup());
+        wpSprite = s;
+        wpSprite.setID(getID());
+        getPane().getChildren().add(wpSprite.getGroup());
+        wpSprite.getFrame().setVisible(false);
+        SpriteTracker.trackSprite(wpSprite);
+        setUpWPAnim();
     }
 
     @Override

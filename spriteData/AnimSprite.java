@@ -15,7 +15,7 @@ import values.IntVal;
  */
 public abstract class AnimSprite extends Sprite {
 
-    public final int BASE_FRAME_RATE = 128;
+    public final static int BASE_FRAME_RATE = 128;
 
     private IntVal frameCount;
     private WritableImage[] frameSet;

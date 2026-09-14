@@ -7,8 +7,7 @@ import dialogue.Dialogue;
 import movement.NPCState;
 import spriteData.charSprite.CharSprite;
 import spriteData.charSprite.CombatSprite;
-import worldData.statData.DialogueTracker;
-
+import control.runtimeTrackers.worldData.DialogueTracker;
 import static collision.ColType.*;
 
 public class SpriteBehavior {
