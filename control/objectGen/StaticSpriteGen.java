@@ -1,4 +1,4 @@
-package worldStage.loading;
+package control.objectGen;
 
 import spriteData.backgroundSprite.StaticSprite;
 

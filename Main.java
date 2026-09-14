@@ -1,4 +1,8 @@
+import charData.GameChar;
+import charData.attr.Attr;
+import charData.stat.Stat;
 import control.Controller;
+import control.handlers.StatChangeHandler;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -12,8 +16,8 @@ import menus.Menus;
 import movement.CharMvmnt;
 import tileSet.TileSetMaker;
 import worldData.WorldData;
-import worldData.objectData.SpriteTracker;
-import worldData.statData.StatTracker;
+import control.runtimeTrackers.spriteData.SpriteTracker;
+import control.runtimeTrackers.worldData.StatTracker;
 import worldStage.WorldMaker;
 import worldStage.WorldStage;
 import java.util.Timer;
@@ -25,6 +29,7 @@ public class Main extends Application {
 
     /** Runs before start **/
     public void init() {
+        StatChangeHandler.setUp();
         WorldStage world = WorldMaker.makeWorld(TileSetMaker.makeTileSet("resources/object_data/tile_set_data/grass_area.txt"));
         WorldData.bg = world.getWorld();
         WorldData.bg.getGroup().getChildren().add(Menus.overlay);
@@ -83,7 +88,15 @@ public class Main extends Application {
 
     //TESTING------------------------------------------------------------------------------------------------------------
         SpriteTracker.charSprites.get(SpriteTracker.playerID).setMaxSpeed(1.5);
-        StatTracker.gameChars.get(SpriteTracker.playerID).lvl().incAttrPoints();
+        StatTracker.gameChars.get(SpriteTracker.playerID).lvl().incAttrPoints(100);
+        StatTracker.gameChars.forEach((Integer id, GameChar c) -> {
+            c.stats().healVitals(1000);
+        });
+        StatTracker.gameChars.get(SpriteTracker.playerID).stats().damage(Stat.SP, 50.0);
+        StatTracker.gameChars.get(SpriteTracker.playerID).stats().damage(Stat.HP, 50.0);
+        //StatTracker.gameChars.get(SpriteTracker.playerID).attr().skillUp(Attr.AGILITY, 100);
+        StatChangeHandler.updateStatsFromAttr(SpriteTracker.playerID);
+
 
         Timer gameTimer = new Timer();
         gameTimer.scheduleAtFixedRate(new TimerTask() {

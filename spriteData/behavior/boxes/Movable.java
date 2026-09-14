@@ -9,4 +9,5 @@ import spriteData.Dir;
 public interface Movable {
     Dir getDir();
     void switchDir(Dir direction);
+    void setMaxSpeed(double val);
 }

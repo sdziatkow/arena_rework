@@ -4,4 +4,7 @@ import itemData.Item;
 
 public class Armor extends Item {
 
+    public Armor() {
+
+    }
 }

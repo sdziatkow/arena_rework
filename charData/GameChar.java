@@ -4,7 +4,6 @@ import charData.attr.Attr;
 import charData.attr.CharAttr;
 import charData.stat.CharStats;
 import values.IntVal;
-
 import java.util.ArrayList;
 
 /** A representation of all data making up a game character.
@@ -60,38 +59,7 @@ public class GameChar extends CharData {
 
     /** SHOULD ONLY BE CALLED ONCE. (for gameplay reasons). */
     public void setInitialAttrValues() {
-        switch (charClass) {
-            case BARBARIAN:
-                attr.get(Attr.VIGOR).inc(10);
-                attr.get(Attr.ENDURANCE).inc(10);
-                attr.get(Attr.STRENGTH).inc(10);
-                break;
-            case BRUTE:
-                attr.get(Attr.ENDURANCE).inc(10);
-                attr.get(Attr.WILLPOWER).inc(10);
-                attr.get(Attr.STRENGTH).inc(10);
-                break;
-            case DRIFTER:
-                attr.get(Attr.AGILITY).inc(10);
-                attr.get(Attr.ENDURANCE).inc(10);
-                attr.get(Attr.WILLPOWER).inc(10);
-                break;
-            case RANGER:
-                attr.get(Attr.AGILITY).inc(10);
-                attr.get(Attr.DEXTERITY).inc(10);
-                attr.get(Attr.ENDURANCE).inc(10);
-                break;
-            case SCOUT:
-                attr.get(Attr.VIGOR).inc(10);
-                attr.get(Attr.AGILITY).inc(10);
-                attr.get(Attr.ENDURANCE).inc(10);
-                break;
-            case MONK:
-                attr.get(Attr.VIGOR).inc(10);
-                attr.get(Attr.WILLPOWER).inc(10);
-                attr.get(Attr.AGILITY).inc(10);
-                break;
-        }
+        for (Attr a : Attr.ALL) attr().skillUp(a, CharClass.defaultAttrVal(charClass).get(a));
     }
 
     /** This is not an Object field, SHOULD BE STORED IN LOCAL VARIABLE FOR USE. */

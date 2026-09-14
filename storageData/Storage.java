@@ -81,7 +81,7 @@ public class Storage extends ArenaObject {
 
     /**
      * Checks for default ordering (COMPARES NAMES) to find if given item in this list.
-     * @return The item in the given list who's name matches the given item
+     * @return The item in the given list whose name matches the given item
      * @see Item
      */
     public Item grabByName(String itemName) {

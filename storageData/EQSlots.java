@@ -1,10 +1,14 @@
 package storageData;
 
+import charData.attr.Attr;
 import control.ArenaObject;
 import itemData.Item;
 import itemData.armors.Armor;
 import itemData.usables.Usable;
 import itemData.weapons.Weapon;
+import values.IntVal;
+import worldData.WorldData;
+import control.runtimeTrackers.worldData.StatTracker;
 
 import java.util.Arrays;
 
@@ -36,7 +40,6 @@ public class EQSlots extends ArenaObject {
         if (item instanceof Usable u){
             items[USE] = u;
         }
-
     }
 
     public void unequip(Item item) {

@@ -4,6 +4,7 @@ import charData.attr.Attr;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import values.IntVal;
+import worldData.WorldData;
 
 /** A representation of a game character's Level and its values.
  * @see Attr
@@ -66,6 +67,8 @@ public class Level {
 
     public void incAttrPoints() {++attrPoints;}
     public void decAttrPoints() {--attrPoints;}
+    public void incAttrPoints(int amnt) {attrPoints += amnt;}
+    public void decAttrPoints(int amnt) {attrPoints -= amnt;}
 
     /** @return true if current xp is greater than or equal to the required amount to level up. */
     public boolean canLvlUp() { return (xp >= toNext); }

@@ -2,7 +2,7 @@ package spriteData.charSprite;
 
 import collision.BoxSizer;
 import collision.CollisionBox;
-import control.AttkHandler;
+import control.handlers.AttkHandler;
 import menus.statBar.StatBar;
 import movement.NPCState;
 import spriteData.MovingSprite;

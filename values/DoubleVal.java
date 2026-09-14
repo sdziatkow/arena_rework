@@ -43,6 +43,15 @@ public class DoubleVal {
         else val = Math.min(v, max);
         progressVal.set(val / max);
     }
+    public void set(ValType v, double val) {
+        switch (v) {
+            case MIN: setMin(val); break;
+            case MAX: setMax(val); break;
+            case VAL:
+            default: set(val); break;
+        }
+    }
+
     public void inc()         { set(val + 1.0);    }
     public void inc(double amnt) { set(val + amnt); }
     public void dec()         { set(val - 1.0);    }
@@ -51,6 +60,14 @@ public class DoubleVal {
     public double getMin() {return min;}
     public double getMax() {return max;}
     public double get() {return val;}
+    public double get(ValType v) {
+        switch (v) {
+            case MIN: return getMin();
+            case MAX: return getMax();
+            case VAL:
+            default: return get();
+        }
+    }
 
     private void validateMin(double min) {
         if (min >= max) throw new IllegalArgumentException("Can not set min value to be more than max value.");

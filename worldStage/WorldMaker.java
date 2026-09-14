@@ -1,18 +1,20 @@
 package worldStage;
 
 import dialogue.DialogueMaker;
+import itemData.usables.StatPot;
 import itemData.weapons.Weapon;
 import spriteData.backgroundSprite.StorageSprite;
 import tileSet.TileSet;
-import worldStage.loading.GameCharGen;
-import worldStage.loading.ItemGen;
-import worldStage.loading.StaticSpriteGen;
+import control.objectGen.GameCharGen;
+import control.objectGen.ItemGen;
+import control.objectGen.StaticSpriteGen;
 
 public class WorldMaker {
 
     public static WorldStage makeWorld(TileSet tileSet) {
         int[] spawn = new int[]{1500, 1500};
         WorldStage world = new WorldStage(tileSet, spawn);
+
         world.addChar(
                 GameCharGen.genChar("resources/object_data/char_data/log.txt"),
                 new int[]{spawn[0], spawn[1] + 100},
@@ -45,6 +47,11 @@ public class WorldMaker {
                 ItemGen.genItem("resources/object_data/item_data/wpn_data/steel_sword.txt", new Weapon()),
                 1,
                 new int[]{spawn[0] - 50, spawn[1]}
+        );
+        world.addItemNoStorage(
+          ItemGen.genItem("resources/object_data/item_data/usable_data/statpot_data/hp_pot.txt", new StatPot()),
+          1,
+          new int[] {spawn[0] - 50, spawn[1] + 80}
         );
         world.setUpStatBars();
         return world;

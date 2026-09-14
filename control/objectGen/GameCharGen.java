@@ -1,58 +1,59 @@
-package worldStage.loading;
+package control.objectGen;
 
+import charData.CharClass;
+import charData.GameChar;
+import charData.attr.Attr;
+import charData.stat.Stat;
+import control.ArenaObject;
+import control.handlers.StatChangeHandler;
 import itemData.Item;
+import itemData.ItemType;
+import itemData.armors.Armor;
+import itemData.usables.Usable;
 import itemData.weapons.Weapon;
+import storageData.Storage;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-public class ItemGen {
+public class GameCharGen {
 
-    public static Item genItem(String pathToData, Item i) {
+    public static GameChar genChar(String pathToData) {
         try { // Get the file set up.
             FileInputStream inFile = new FileInputStream(pathToData);
             Scanner scn = new Scanner(inFile);
             scn.useDelimiter("[|]|\\n");
+            GameChar c = new GameChar();
             while (scn.hasNext()) {
                 String currField = scn.next();
                 String fieldVal =  scn.next();
                 fieldVal = fieldVal.replaceAll("\r", "");
-                if (i instanceof Weapon w) setWeaponData(currField, fieldVal, w);
+                setData(currField, fieldVal, c);
             }
             scn.close();
-            return i;
+            return c;
         } catch (FileNotFoundException e) {
             throw new IllegalArgumentException("Given file path does not exist.");
         }
     }
 
-    private static void setWeaponData(String field, String val, Weapon w) {
+    private static void setData(String field, String val, GameChar c)  {
         switch (field) {
-            case "name":
-            case "value":
-            case "pickableSheet":
-                setItemData(field, val, w);
+            case "mvSheet":
+                c.setPathToMvSheet(val);
                 break;
-            case "wpnSheet":
-                w.setPathToWpnSprite(val);
+            case "attkSheet":
+                c.setPathToAttkSheet(val);
+                break;
+            case "name":
+                c.setName(val);
+                break;
+            case "class":
+                c.setCharClass(CharClass.valueOf(val));
+                c.setInitialAttrValues();
                 break;
             default: throw new IllegalArgumentException("Given file is not set up correctly.");
         }
     }
-
-    private static void setItemData(String field, String val, Item i)  {
-        switch (field) {
-            case "name":
-                i.setName(val);
-                break;
-            case "value":
-                i.val().set(Integer.valueOf(val));
-                break;
-            case "pickableSheet":
-                i.setPathToPickableSprite(val);
-                break;
-            default: throw new IllegalArgumentException("Given file is not set up correctly.");
-        }
-    }
-
 }

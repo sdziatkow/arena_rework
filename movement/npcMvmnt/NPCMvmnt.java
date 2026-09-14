@@ -11,9 +11,8 @@ import spriteData.charSprite.CharSprite;
 import spriteData.charSprite.CombatSprite;
 import values.IntVal;
 import worldData.WorldData;
-import worldData.objectData.BoxTracker;
+import control.runtimeTrackers.spriteData.BoxTracker;
 
-import java.nio.file.Path;
 import java.util.Random;
 import java.util.Stack;
 

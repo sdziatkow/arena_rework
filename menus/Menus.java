@@ -12,9 +12,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import menus.gameCharDisp.AttrMenu;
 import menus.gameCharDisp.CharMenu;
@@ -22,13 +26,13 @@ import menus.gameCharDisp.StatMenu;
 import menus.statBar.StatBarDisp;
 import menus.storageDisp.StorageMenu;
 import storageData.Storage;
-import values.DoubleVal;
 
 public class Menus {
     private static final GridPane menuSpace = new GridPane();
-    public static final Group overlay = new Group(menuSpace);
+    private static final FlowPane screenSpace = new FlowPane(menuSpace);
+    public static final Group overlay = new Group(screenSpace);
 
-    public static void clearMenus() { menuSpace.getChildren().clear(); }
+    public static void clearMenus() {menuSpace.getChildren().clear();}
 
 //GAME-CHARACTER---------------------------------------------------------------------------------------------------------
 
@@ -53,7 +57,7 @@ public class Menus {
                         dispStats(gameChar.stats());
                         break;
                     case ATTRIBUTES:
-                        dispAttr(gameChar.attr(), gameChar.lvl());
+                        dispAttr(gameChar);
                         break;
                     case BACKPACK:
                         dispStorage(backpack);
@@ -91,8 +95,8 @@ public class Menus {
         menuSpace.add(menu.main, menuSpace.getColumnCount(), menuSpace.getRowCount());
     }
 
-    private static void dispAttr(CharAttr c, Level l) {
-        AttrMenu menu = new AttrMenu(c, l);
+    private static void dispAttr(GameChar c) {
+        AttrMenu menu = new AttrMenu(c);
         menuSpace.add(menu.main, menuSpace.getColumnCount(), menuSpace.getRowCount());
     }
 
@@ -151,12 +155,14 @@ public class Menus {
 
 //STAT-BARS--------------------------------------------------------------------------------------------------------------
 
-    public static void addOverlayStatBars(DoubleProperty hp, DoubleProperty sp, DoubleProperty xp) {
-        StatBarDisp s = new StatBarDisp(hp, sp, xp);
+    public static void addOverlayStatBars(DoubleProperty hp, DoubleProperty mp, DoubleProperty sp, DoubleProperty xp) {
+        StatBarDisp s = new StatBarDisp(hp, mp, sp, xp);
         s.getContainer().setTranslateY(5.0);
-        s.getContainer().setTranslateX(-5.0);
-        overlay.getChildren().add(s.getContainer());
-
+        screenSpace.getChildren().add(s.getContainer());
+        screenSpace.setAlignment(Pos.TOP_LEFT);
+        screenSpace.setOrientation(Orientation.VERTICAL);
+        screenSpace.setRowValignment(VPos.TOP);
+        screenSpace.setPrefSize(100, 1000);
     }
 
 }

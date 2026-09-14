@@ -37,6 +37,7 @@ public class MovingSprite extends FourWaySprite implements Movable {
     }
 
     /** @param maxRate The maximum move rate of this Sprite. */
+    @Override
     public void setMaxSpeed(double maxRate) { speed.setMax(maxRate); }
 
     public void setMvState(MvState state) { mvState = state; }

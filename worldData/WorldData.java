@@ -1,35 +1,22 @@
 package worldData;
 
-import charData.GameChar;
 import collision.ColChecker;
-import collision.ColType;
-import control.AttkHandler;
+import control.handlers.AttkHandler;
 import control.ViewHelper;
+import control.handlers.EquipHandler;
 import dialogue.Dialogue;
-import itemData.Item;
-import itemData.usables.Usable;
-import itemData.weapons.Weapon;
-import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.ParallelCamera;
-import javafx.scene.layout.GridPane;
 import menus.Menus;
 import movement.MvState;
 import movement.PlayerMvmnt;
 import movement.npcMvmnt.NPCMvmnt;
-import spriteData.charSprite.CombatSprite;
-import spriteData.weaponSprite.WeaponSprite;
-import storageData.EQSlots;
-import storageData.Storage;
 import tileSet.TileSet;
-import worldData.objectData.BoxTracker;
-import worldData.objectData.MvmntTracker;
-import worldData.objectData.SpriteTracker;
-import worldData.statData.DialogueTracker;
-import worldData.statData.StatTracker;
-import worldData.statData.StorageTracker;
-
-import java.util.Objects;
+import control.runtimeTrackers.spriteData.BoxTracker;
+import control.runtimeTrackers.spriteData.MvmntTracker;
+import control.runtimeTrackers.spriteData.SpriteTracker;
+import control.runtimeTrackers.worldData.DialogueTracker;
+import control.runtimeTrackers.worldData.StatTracker;
+import control.runtimeTrackers.worldData.StorageTracker;
 import java.util.Stack;
 
 import static collision.ColType.*;
@@ -96,47 +83,13 @@ public class WorldData {
 
 //STORAGE----------------------------------------------------------------------------------------------------------------
 
-    public static void eqItemFromOwnStorage(Integer storageID, Integer itemID) {
-        Item item = StorageTracker.items.get(itemID);
-        if (item == null) return;
-        if (item.getStorageID() != storageID) return;
-        item.toggleEquipped(true);
-        EQSlots eqSlots = StorageTracker.eqSlots.get(storageID);
-        if (eqSlots == null) return;
-        eqSlots.equip(item);
-        if (item instanceof Weapon) {
-            CombatSprite sprite = SpriteTracker.combatSprites.get(storageID);
-            if (sprite == null) return;
-            sprite.setWPSprite(new WeaponSprite(((Weapon)item).getPathToWpnSprite()));
-        }
-    }
-
-    public static void unEqItemFromOwnStorage(Integer storageID, Integer itemID) {
-        Item item = StorageTracker.items.get(itemID);
-        if (item == null) return;
-        if (item.getStorageID() != storageID) return;
-        item.toggleEquipped(false);
-        EQSlots eqSlots = StorageTracker.eqSlots.get(storageID);
-        if (eqSlots == null) return;
-        eqSlots.unequip(item);
-        if (item instanceof Weapon) {
-            CombatSprite sprite = SpriteTracker.combatSprites.get(storageID);
-            if (sprite == null) return;
-            sprite.clearWPSprite();
-        }
-    }
-    public void useEquippedUsable(int gameCharID) {
-        EQSlots eqSlots = StorageTracker.eqSlots.get(gameCharID);
-        if (eqSlots == null) return;
-        Usable item = (Usable)eqSlots.use();
-        if (item == null) return;
-        GameChar gameChar = StatTracker.gameChars.get(gameCharID);
-        if (gameChar == null) return;
-        //TODO: Heal shit.
+    public static void useEquippedUsable(int gameCharID) {
+        EquipHandler.handleUse(gameCharID, StorageTracker.eqSlots.get(gameCharID).use().getID());
     }
 
     public static void onItemPickedUp(int toStorageID, int itemID) {
         StorageTracker.addToStorage(toStorageID, itemID);
+        removeSprite(itemID);
     }
 
 //MENUS------------------------------------------------------------------------------------------------------------------

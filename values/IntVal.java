@@ -1,24 +1,26 @@
 package values;
 
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
 public class IntVal {
     private int min;
     private int max;
     private int val;
-    private IntegerProperty progressVal;
+    private DoubleProperty progressVal;
 
     /** Default min = 0; max = 1; val = 0; */
     public IntVal() {
         min = 0;
         max = 1;
         val = 0;
-        progressVal = new SimpleIntegerProperty(0);
+        progressVal = new SimpleDoubleProperty(0);
     }
 
     public IntVal(int min, int max, int val) {
-        progressVal = new SimpleIntegerProperty(0);
+        progressVal = new SimpleDoubleProperty(0);
         this.max = 1;
         setMin(min);
         setMax(max);
@@ -33,7 +35,7 @@ public class IntVal {
     public void setMax(int v) {
         validateMax(v);
         max = v;
-        progressVal.set(val / max);
+        progressVal.set((double)val / (double)max);
     }
 
     /** Set this value to its minimum value. */
@@ -41,7 +43,15 @@ public class IntVal {
     public void set(int v) {
         if (v < min) val = min;
         else val = Math.min(v, max); // If v is greater than max, set val to max.
-        progressVal.set(val / max);
+        progressVal.set((double)val / (double)max);
+    }
+    public void set(ValType v, int val) {
+        switch (v) {
+            case MIN: setMin(val); break;
+            case MAX: setMax(val); break;
+            case VAL:
+            default: set(val); break;
+        }
     }
 
     public void inc()         { set(val + 1);    }
@@ -52,6 +62,14 @@ public class IntVal {
     public int getMin() {return min;}
     public int getMax() {return max;}
     public int get() {return val;}
+    public int get(ValType v) {
+        switch (v) {
+            case MIN: return getMin();
+            case MAX: return getMax();
+            case VAL:
+            default: return get();
+        }
+    }
 
     private void validateMin(int min) {
         if (min >= max) throw new IllegalArgumentException("Can not set min value to be more than max value.");
@@ -72,5 +90,5 @@ public class IntVal {
         return out;
     }
 
-    public IntegerProperty getProgressVal() {return progressVal;}
+    public DoubleProperty getProgressVal() {return progressVal;}
 }

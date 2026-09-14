@@ -33,7 +33,6 @@ public class PickableSprite extends StaticSprite implements Interactable {
     @Override
     public void onInteract(int interactorID) {
         WorldData.onItemPickedUp(interactorID, getID());
-        WorldData.removeSprite(getID());
     }
 
 }
