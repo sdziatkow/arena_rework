@@ -1,6 +1,7 @@
 import charData.GameChar;
 import charData.attr.Attr;
 import charData.stat.Stat;
+import charData.statMods.StatMod;
 import control.Controller;
 import control.handlers.StatChangeHandler;
 import javafx.application.Application;
@@ -29,7 +30,6 @@ public class Main extends Application {
 
     /** Runs before start **/
     public void init() {
-        StatChangeHandler.setUp();
         WorldStage world = WorldMaker.makeWorld(TileSetMaker.makeTileSet("resources/object_data/tile_set_data/grass_area.txt"));
         WorldData.bg = world.getWorld();
         WorldData.bg.getGroup().getChildren().add(Menus.overlay);
@@ -90,7 +90,7 @@ public class Main extends Application {
         SpriteTracker.charSprites.get(SpriteTracker.playerID).setMaxSpeed(1.5);
         StatTracker.gameChars.get(SpriteTracker.playerID).lvl().incAttrPoints(100);
         StatTracker.gameChars.forEach((Integer id, GameChar c) -> {
-            c.stats().healVitals(1000);
+            c.stats().healVitals(50);
         });
         StatTracker.gameChars.get(SpriteTracker.playerID).stats().damage(Stat.SP, 50.0);
         StatTracker.gameChars.get(SpriteTracker.playerID).stats().damage(Stat.HP, 50.0);
@@ -102,7 +102,7 @@ public class Main extends Application {
         gameTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                Platform.runLater(WorldData::runMvmnt);
+                Platform.runLater(WorldData::run);
             }
         }, 0, 32);
     }
