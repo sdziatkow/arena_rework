@@ -2,9 +2,12 @@ package control.objectGen;
 
 import charData.attr.Attr;
 import charData.stat.Stat;
+import charData.statMods.StatChange;
 import itemData.DmgType;
 import itemData.Item;
 import itemData.weapons.Weapon;
+import values.ValType;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
@@ -69,24 +72,31 @@ public class ItemGen {
             case "pickableSheet":
                 i.setPathToPickableSprite(val);
                 break;
-            case "attrChange":
-                parseAttrOrStatChanges(val, i, true);
-                break;
-            case "statChange":
-                parseAttrOrStatChanges(val, i, false);
+            case "statMod":
+                parseStatMod(val, i);
                 break;
             default: throw new IllegalArgumentException("Given file is not set up correctly.");
         }
     }
 
-    private static void parseAttrOrStatChanges(String statString, Item i, boolean isAttr) {
+    private static void parseStatMod(String statString, Item i) {
         Scanner scn = new Scanner(statString);
         scn.useDelimiter(";");
         while (scn.hasNext()) {
-            String stat = scn.next();
+            String change = scn.next();
             String val = scn.next();
-            if (isAttr) i.addAttrChange(Attr.valueOf(stat), Integer.parseInt(val));
-            else i.addStatChange(Stat.valueOf(stat), Double.parseDouble(val));
+            String stat = scn.next();
+            String amnt = scn.next();
+            try {
+                i.statMod().addAttrChange(
+                    StatChange.valueOf(change), ValType.valueOf(val), Attr.valueOf(stat), Integer.parseInt(amnt)
+                );
+            }
+            catch (IllegalArgumentException e) {
+                i.statMod().addStatChange(
+                    StatChange.valueOf(change), ValType.valueOf(val), Stat.valueOf(stat), Double.parseDouble(amnt)
+                );
+            }
         }
         scn.close();
     }

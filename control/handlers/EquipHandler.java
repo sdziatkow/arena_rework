@@ -53,17 +53,12 @@ public class EquipHandler {
         item.toggleEquipped(eqChangeStatus);
 
         // Equip or Dequip given item.
-        char changeSign;
-        if (eqChangeStatus) {
-            eqSlots.equip(item);
-            changeSign = '+';
-        }
-        else {
-            eqSlots.unequip(item);
-            changeSign = '-';
-        }
+        if (eqChangeStatus) eqSlots.equip(item);
+        else eqSlots.unequip(item);
+
+        // Apply the Item's StatMod on equip, only if it is not Usable.
         if (!(item instanceof Usable)) {
-            StatChangeHandler.applyItemChanges(eqSlots.getID(), item.getID(), ValType.MAX, changeSign);
+            StatChangeHandler.applyStatMod(eqSlots.getID(), item.statMod());
         }
 
         if (item instanceof Weapon) {
@@ -83,7 +78,7 @@ public class EquipHandler {
 //USING------------------------------------------------------------------------------------------------------------------
 
     public static void useEquippedUsable(Usable item, EQSlots eqSlots, Storage stg) {
-        StatChangeHandler.applyItemChanges(eqSlots.getID(), item.getID(), ValType.VAL, '+');
+        StatChangeHandler.applyStatMod(eqSlots.getID(), item.statMod());
         item.amnt().dec();
         if (item.amnt().isMin()) {
             handleEquip(stg.getID(), item.getID(), WorldLocation.STORAGE, EQAction.UN_EQUIP);

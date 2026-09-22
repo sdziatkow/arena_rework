@@ -33,6 +33,7 @@ public class Menus {
     public static final Group overlay = new Group(screenSpace);
 
     public static void clearMenus() {menuSpace.getChildren().clear();}
+    public static boolean isMenuShowing() {return !menuSpace.getChildren().isEmpty();}
 
 //GAME-CHARACTER---------------------------------------------------------------------------------------------------------
 
@@ -86,7 +87,7 @@ public class Menus {
     }
 
     public static void dispPicker(GameChar g, Storage s) {
-        if (!menuSpace.getChildren().isEmpty()) clearMenus();
+        if (isMenuShowing()) clearMenus();
         menuSpace.add(new MenuPicker(g, s).typeSelector, menuSpace.getColumnCount(), menuSpace.getRowCount());
     }
 
@@ -113,7 +114,7 @@ public class Menus {
 //STORAGE----------------------------------------------------------------------------------------------------------------
 
     public static void dispStorageInteraction(Storage interactor, Storage interactable) {
-        if (!menuSpace.getChildren().isEmpty()) clearMenus();
+        if (isMenuShowing()) clearMenus();
         StorageMenu m1 = new StorageMenu(interactor, false);
         StorageMenu m2 = new StorageMenu(interactable, false);
         Button put = new Button("Put");
