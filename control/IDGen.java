@@ -15,8 +15,4 @@ public class IDGen {
         } while(!IDS.add(newID));
         return newID;
     }
-
-    public static void genAmntIDS(int amnt) {
-        for (int i = 0; i < amnt; ++i) genID();
-    }
 }

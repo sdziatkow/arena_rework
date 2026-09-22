@@ -119,9 +119,6 @@ public class WorldStage {
         StatChangeHandler.updateStatsFromAttr(ID);
         world.getGroup().getChildren().add(sprite.getGroup());
         sprite.setPos(pos[0], pos[1]);
-//        sprite.getWorldBox().getColBox().setOpacity(1);
-//        sprite.getCheckBox().getColBox().setOpacity(1);
-//        sprite.getHurtBox().getColBox().setOpacity(1);
         return ID;
     }
 
@@ -141,7 +138,6 @@ public class WorldStage {
 
         world.getGroup().getChildren().add(sprite.getGroup());
         sprite.setPos(pos[0], pos[1]);
-//        sprite.getWorldBox().getColBox().setOpacity(1);
         return ID;
     }
 
@@ -168,9 +164,6 @@ public class WorldStage {
 
         world.getGroup().getChildren().add(sprite.getGroup());
         sprite.setPos(pos[0], pos[1]);
-
-        //sprite.getBox(ColType.WORLDBOX).getColBox().setOpacity(1);
-        //sprite.getBox(ColType.INTERACTBOX).getColBox().setOpacity(1);
         return ID;
     }
 

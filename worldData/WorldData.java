@@ -1,5 +1,7 @@
 package worldData;
 
+import charData.GameChar;
+import charData.stat.Stat;
 import collision.ColChecker;
 import control.handlers.AttkHandler;
 import control.ViewHelper;
@@ -20,13 +22,30 @@ import control.runtimeTrackers.worldData.StorageTracker;
 import java.util.Stack;
 
 import static collision.ColType.*;
+import static values.ValType.MAX;
+import static worldData.GameState.IN_MENU;
+import static worldData.GameState.RUNNING;
 
 public class WorldData {
-    public static GameState state = GameState.RUNNING;
+    public static GameState state = RUNNING;
     public static TileSet bg;
     public static ParallelCamera cam = new ParallelCamera();
 
 //STATE------------------------------------------------------------------------------------------------------------------
+
+    public static void run() {
+        switch (state) {
+            case RUNNING:
+                runMvmnt();
+                regenStats();
+                break;
+            case IN_MENU:
+                break;
+            case PAUSED:
+                break;
+            default: break;
+        }
+    }
 
     public static void runMvmnt() {
         ViewHelper.updateViewOrder(BoxTracker.getBoxes(WORLDBOX));
@@ -43,6 +62,16 @@ public class WorldData {
 
         // Run NPC Movement
         MvmntTracker.allNPCMvmnts.values().forEach(NPCMvmnt::runMvmnt);
+    }
+
+    //TODO: Make this systematic. Dont calculate in this function, calculate based on Attributes.
+    public static void regenStats() {
+        StatTracker.gameChars.forEach((Integer id, GameChar c) -> {
+            for (Stat vital : Stat.VITALS) {
+                double amnt = c.stats().get(vital, MAX) / 10000;
+                c.stats().heal(vital, amnt);
+            }
+        });
     }
 
 //GAME-EVENTS------------------------------------------------------------------------------------------------------------

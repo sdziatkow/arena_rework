@@ -21,7 +21,7 @@ public class Controller {
             case A:
             case S:
             case D:
-                mvmntKeysDown.add(key);
+                Platform.runLater(() -> mvmntKeysDown.add(key));
             break;
             case E:
                 Platform.runLater(() -> WorldData.triggerInteract(SpriteTracker.playerID));
@@ -44,7 +44,7 @@ public class Controller {
             case A:
             case S:
             case D:
-                mvmntKeysDown.remove(key);
+                Platform.runLater(() -> mvmntKeysDown.remove(key));
                 break;
             default: return;
         }
