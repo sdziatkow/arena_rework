@@ -1,12 +1,7 @@
 package worldStage;
 
-import control.IDGen;
-import control.runtimeTrackers.worldData.StorageTracker;
+import control.objectGen.StorageSpriteGen;
 import dialogue.DialogueMaker;
-import itemData.Item;
-import itemData.usables.StatPot;
-import itemData.weapons.Weapon;
-import spriteData.backgroundSprite.StorageSprite;
 import tileSet.TileSet;
 import control.objectGen.GameCharGen;
 import control.objectGen.ItemGen;
@@ -19,7 +14,7 @@ public class WorldMaker {
         WorldStage world = new WorldStage(tileSet, spawn);
 
         world.addChar(
-                GameCharGen.genChar("resources/object_data/char_data/log.txt"),
+                GameCharGen.genChar("GC001"),
                 new int[]{spawn[0], spawn[1] + 100},
                 DialogueMaker.makeDialogue("resources/object_data/char_data/dialogue/log.txt"),
                 false,
@@ -27,7 +22,7 @@ public class WorldMaker {
         );
 
         world.addChar(
-                GameCharGen.genChar("resources/object_data/char_data/test_enemy.txt"),
+                GameCharGen.genChar("GC002"),
                 new int[]{spawn[0], spawn[1] + 400},
                 null,
                 true,
@@ -35,26 +30,26 @@ public class WorldMaker {
         );
 
         world.addStaticSprite(
-                StaticSpriteGen.genStaticSprite("resources/object_data/bg_sprite_data/stone_tower.txt"),
+                StaticSpriteGen.genStaticSprite("BG000"),
                 new int[]{spawn[0] + 100, spawn[1]}
         );
 
         int chestID = world.addStorage(
-                new StorageSprite("file:resources/sprites/bg_sprites/chest/open_1x3_20x20.png"),
+                StorageSpriteGen.genStorageSprite("SS000"),
                 new int[]{spawn[0] - 50, spawn[1] - 50}
         );
         world.addItemToStorage(
-            ItemGen.genItem("resources/object_data/item_data/usable_data/statpot_data/hp_pot.txt", new StatPot()),
+            ItemGen.genItem("IU000"),
             chestID,
             10
         );
 
         world.addItemToWorld(
-                ItemGen.genItem("resources/object_data/item_data/wpn_data/steel_sword.txt", new Weapon()),
+                ItemGen.genItem("IW000"),
                 new int[]{spawn[0] - 50, spawn[1]}
         );
         world.addItemToWorld(
-          ItemGen.genItem("resources/object_data/item_data/usable_data/statpot_data/hp_pot.txt", new StatPot()),
+          ItemGen.genItem("IU000"),
           new int[] {spawn[0] - 50, spawn[1] + 80}
         );
         world.setUpStatBars();

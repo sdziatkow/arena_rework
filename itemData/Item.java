@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * <br> name: A descriptive name of this item.
  * <br> value: The gold value for each individual item.
  */
-public class Item extends ItemData implements Comparable<Item> {
+public class Item extends ItemData {
     private String name;
     private IntVal value;
     private StatMod statMod;
@@ -78,10 +78,4 @@ public class Item extends ItemData implements Comparable<Item> {
         }
         return dispInfo;
     }
-
-//OPERATIONS-------------------------------------------------------------------------------------------------------------
-
-    /** Default ordering; compares this Item's name field to the other's using String.compareTo(). */
-    @Override
-    public int compareTo(Item other) { return this.name.compareTo(other.name); }
 }

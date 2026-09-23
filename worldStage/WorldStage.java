@@ -35,7 +35,7 @@ public class WorldStage {
         spawn = spawnPoint;
 
         int playerID = addChar(
-                GameCharGen.genChar("resources/object_data/char_data/classes/default_brute.txt"),
+                GameCharGen.genChar("GC000"),
                 new int[]{spawn[0], spawn[1]},
                 null,
                 false,
