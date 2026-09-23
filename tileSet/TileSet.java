@@ -4,7 +4,6 @@ import collision.ColType;
 import collision.CollisionBox;
 import javafx.scene.Group;
 import javafx.scene.layout.*;
-import spriteData.Img;
 
 /**
  * <br>Region floor: The very bottom background (repeating) image of the TileSet.

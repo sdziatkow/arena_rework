@@ -1,37 +1,21 @@
 package control.objectGen;
 
 import spriteData.backgroundSprite.StaticSprite;
+import spriteData.backgroundSprite.StorageSprite;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class StaticSpriteGen {
 
-    public static StaticSprite genStaticSprite(String pathToData) {
-        try { // Get the file set up.
-            FileInputStream inFile = new FileInputStream(pathToData);
-            Scanner scn = new Scanner(inFile);
-            scn.useDelimiter("[|]|\\n");
-
-            StaticSprite sprite = null;
-            if (scn.hasNext()) {
-                String field = scn.next();
-                String pathToFile =  scn.next();
-                sprite = new StaticSprite(pathToFile);
-            } else throw new IllegalArgumentException("Given file is empty.");
-            scn.close();
-            return sprite;
-        } catch (FileNotFoundException e) {
-            throw new IllegalArgumentException("Given file path does not exist.");
-        }
-    }
-
-    private static void setBGSpriteData() {
-
-    }
-
-    private static void setPickableSpriteDate() {
-
+    public static StaticSprite genStaticSprite(String objID) {
+        String pathToData = ObjectDataParser.getDataFromObjectID(ObjectType.STATIC_SPRITE, objID);
+        HashMap<String, String> data = ObjectDataParser.parseObjectData(pathToData);
+        if (data.get("pathToFile") == null) throw new IllegalArgumentException("Given file is not set up correctly.");
+        StaticSprite s = new StaticSprite(data.get("pathToFile"));
+        s.setObjID(objID);
+        return new StaticSprite(data.get("pathToFile"));
     }
 }
