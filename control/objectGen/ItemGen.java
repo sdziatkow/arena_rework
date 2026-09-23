@@ -5,32 +5,43 @@ import charData.stat.Stat;
 import charData.statMods.StatChange;
 import itemData.DmgType;
 import itemData.Item;
+import itemData.armors.Armor;
+import itemData.usables.Usable;
 import itemData.weapons.Weapon;
 import values.ValType;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class ItemGen {
 
-    public static Item genItem(String pathToData, Item i) {
-        try { // Get the file set up.
-            FileInputStream inFile = new FileInputStream(pathToData);
-            Scanner scn = new Scanner(inFile);
-            scn.useDelimiter("[|]|\\n");
-            while (scn.hasNext()) {
-                String currField = scn.next();
-                String fieldVal =  scn.next();
-                fieldVal = fieldVal.replaceAll("\r", "");
-                if (i instanceof Weapon w) setWeaponData(currField, fieldVal, w);
-                else setItemData(currField, fieldVal, i);
-            }
-            scn.close();
-            return i;
-        } catch (FileNotFoundException e) {
-            throw new IllegalArgumentException("Given file path does not exist.");
+    public static Item genItem(String objID) {
+        String pathToData = ObjectDataParser.getDataFromObjectID(ObjectType.ITEM, objID);
+        HashMap<String, String> data = ObjectDataParser.parseObjectData(pathToData);
+        Item i;
+        char typeIndicator = objID.charAt(1);
+        switch (typeIndicator) {
+            case 'U':
+                i = new Usable();
+                break;
+            case 'A':
+                i = new Armor();
+                break;
+            case 'W':
+                i = new Weapon();
+                break;
+            default:
+                i = new Item();
+                break;
         }
+        for (String field: data.keySet()) {
+            if (i instanceof Weapon w) setWeaponData(field, data.get(field), w);
+            else setItemData(field, data.get(field), i);
+        }
+        i.setObjID(objID);
+        return i;
     }
 
     private static void setWeaponData(String field, String val, Weapon w) {
