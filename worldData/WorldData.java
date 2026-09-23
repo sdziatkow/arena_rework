@@ -6,6 +6,7 @@ import collision.ColChecker;
 import control.handlers.AttkHandler;
 import control.ViewHelper;
 import control.handlers.EquipHandler;
+import control.handlers.StorageHandler;
 import dialogue.Dialogue;
 import javafx.scene.ParallelCamera;
 import menus.Menus;
@@ -64,15 +65,7 @@ public class WorldData {
         MvmntTracker.allNPCMvmnts.values().forEach(NPCMvmnt::runMvmnt);
     }
 
-    //TODO: Make this systematic. Dont calculate in this function, calculate based on Attributes.
-    public static void regenStats() {
-        StatTracker.gameChars.forEach((Integer id, GameChar c) -> {
-            for (Stat vital : Stat.VITALS) {
-                double amnt = c.stats().get(vital, MAX) / 10000;
-                c.stats().heal(vital, amnt);
-            }
-        });
-    }
+    public static void regenStats() {StatTracker.gameChars.values().forEach((GameChar g) -> g.stats().regenVitals());}
 
 //GAME-EVENTS------------------------------------------------------------------------------------------------------------
 
@@ -117,7 +110,7 @@ public class WorldData {
     }
 
     public static void onItemPickedUp(int toStorageID, int itemID) {
-        StorageTracker.addToStorage(toStorageID, itemID);
+        StorageHandler.addTo(toStorageID, itemID, 1);
         removeSprite(itemID);
     }
 

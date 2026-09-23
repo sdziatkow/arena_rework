@@ -12,7 +12,12 @@ import control.runtimeTrackers.worldData.StorageTracker;
 import storageData.Storage;
 import values.ValType;
 
-
+/**
+ * Handles all of the following during run-time:
+ * <br>Item equipping
+ * <br>Item un-equipping
+ * <br>Using an equipped Usable Item
+ */
 public class EquipHandler {
 
     public static void handleEquip(Integer storageID, Integer itemID, WorldLocation from, EQAction actn) {
@@ -53,12 +58,23 @@ public class EquipHandler {
         item.toggleEquipped(eqChangeStatus);
 
         // Equip or Dequip given item.
-        if (eqChangeStatus) eqSlots.equip(item);
-        else eqSlots.unequip(item);
+        if (eqChangeStatus) {
+            eqSlots.equip(item);
+        }
+        else {
+            eqSlots.unequip(item);
+        }
 
         // Apply the Item's StatMod on equip, only if it is not Usable.
         if (!(item instanceof Usable)) {
-            StatChangeHandler.applyStatMod(eqSlots.getID(), item.statMod());
+            if (eqChangeStatus) {
+                if (item.statMod().isSwapped()) item.statMod().swapChanges(); // Apply mod
+                StatChangeHandler.applyStatMod(eqSlots.getID(), item.statMod());
+            }
+            else {
+                if (!item.statMod().isSwapped()) item.statMod().swapChanges(); // Undo mod
+                StatChangeHandler.applyStatMod(eqSlots.getID(), item.statMod());
+            }
         }
 
         if (item instanceof Weapon) {
@@ -79,10 +95,9 @@ public class EquipHandler {
 
     public static void useEquippedUsable(Usable item, EQSlots eqSlots, Storage stg) {
         StatChangeHandler.applyStatMod(eqSlots.getID(), item.statMod());
-        item.amnt().dec();
-        if (item.amnt().isMin()) {
+        StorageHandler.removeFrom(stg.getID(), item.getID(), 1);
+        if (!stg.hasItem(item.getID())) { // If item was removed from storage.
             handleEquip(stg.getID(), item.getID(), WorldLocation.STORAGE, EQAction.UN_EQUIP);
-            StorageTracker.removeFromStorage(stg.getID(), item.getID());
             StorageTracker.items.remove(item.getID());
         }
     }

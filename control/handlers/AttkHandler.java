@@ -11,6 +11,11 @@ import java.util.Random;
 import static charData.stat.Stat.*;
 import static values.ValType.VAL;
 
+/**
+ * Handles all of the following during run-time:
+ * <br>Computing damage dealt and taken during attacks.
+ * <br>Applying damage dealt and taken during attacks.
+ */
 public abstract class AttkHandler {
     private final static double MAX_ACCURACY = 200.0;
 

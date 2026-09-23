@@ -2,24 +2,27 @@ package control.handlers;
 
 import charData.GameChar;
 import charData.attr.Attr;
-import charData.attr.CharAttr;
-import charData.stat.CharStats;
 import charData.stat.Stat;
 import charData.statMods.StatChange;
 import charData.statMods.StatMod;
 import control.runtimeTrackers.spriteData.SpriteTracker;
 import control.runtimeTrackers.worldData.StatTracker;
-import control.runtimeTrackers.worldData.StorageTracker;
-import itemData.Item;
 import spriteData.behavior.boxes.Movable;
 import spriteData.charSprite.CombatSprite;
 import values.ValType;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 
+/**
+ * Handles all of the following during run-time:
+ * <br>Updates GameChar CharStats to reflect their CharAttr.
+ * <br>Apply StatMods to GameChars
+ */
 public class StatChangeHandler {
 
+    /**
+     * This method will generate the given GameChar's CharStats based on their CharAttr.
+     * Will also update their move and attack speed.
+     * @param gameCharID The GameChar Object whose CharStats should be updated to reflect their CharAttr values.
+     */
     public static void updateStatsFromAttr(Integer gameCharID) {
         GameChar g = StatTracker.gameChars.get(gameCharID);
         if (g == null) return;
@@ -28,11 +31,12 @@ public class StatChangeHandler {
         updateMoveSpeed(gameCharID);
     }
 
+    //TODO: needs more testing for how much it effects it. (if it affects it at all)
     public static void updateAttkSpeed(int gameCharID) {
         double gSpeed = StatTracker.gameChars.get(gameCharID).stats().get(Stat.SPEED, ValType.VAL);
         CombatSprite sprite = SpriteTracker.combatSprites.get(gameCharID);
         if (sprite == null) return;
-        double attkSpeed = ((gSpeed * 1.5) / (100.0 + (gSpeed / 2.0))); //TODO: needs more testing for how much it effects it.
+        double attkSpeed = ((gSpeed * 1.5) / (100.0 + (gSpeed / 2.0)));
         sprite.setAttkSpeed(attkSpeed);
         //System.out.println("|> New Attack Speed: " + sprite.getAttkSpeed());
     }
@@ -76,6 +80,7 @@ public class StatChangeHandler {
             case PLUS: return (val + mod);
             case MINUS: return (val - mod);
             case MULT: return (val * mod);
+            case DIV: return (val / mod);
             default: return val;
         }
     }

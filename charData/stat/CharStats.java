@@ -12,6 +12,7 @@ import values.ValType;
  */
 public class CharStats {
     private final HashMap<Stat, DoubleVal> ALL_STATS;
+    private final HashMap<Stat, Double> REGEN_VALS;
 
     public CharStats() {
         ALL_STATS = new HashMap<>(Stat.ALL.length);
@@ -20,6 +21,10 @@ public class CharStats {
 
             // Arbitrary, the max does not really matter on non-vital stats.
             if (!Stat.isVital(s)) ALL_STATS.get(s).setMax(10000.0);
+        }
+        REGEN_VALS = new HashMap<>();
+        for (Stat s : Stat.VITALS) {
+            REGEN_VALS.put(s, 0.00);
         }
     }
 
@@ -41,6 +46,12 @@ public class CharStats {
      */
     public void setVal(Stat s, double val) {ALL_STATS.get(s).set(ValType.VAL, val);}
 
+    /**
+     * @param s The Vital Stat to set the regen value of.
+     * @param val The value to set the given Vital Stat's regen value to.
+     */
+    public void setRegenVal(Stat s, double val) {REGEN_VALS.replace(s, val);}
+
 //GETTERS----------------------------------------------------------------------------------------------------------------
 
     public double get(Stat s, ValType v) { return ALL_STATS.get(s).get(v); }
@@ -61,6 +72,11 @@ public class CharStats {
      * @param amnt The amount to heal all vitals by.
      */
     public void healVitals(double amnt) {for (Stat s : Stat.VITALS) {heal(s, amnt);}}
+
+    /**
+     * Heal all Vital Stats by their REGEN_VALUES.
+     */
+    public void regenVitals() {for (Stat s : Stat.VITALS) {heal(s, REGEN_VALS.get(s));}}
 
     /**
      * Decrement the given stat's ValType.VAL by given amnt.

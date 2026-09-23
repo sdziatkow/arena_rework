@@ -4,6 +4,7 @@ import charData.GameChar;
 import charData.stat.Stat;
 import control.IDGen;
 import control.handlers.StatChangeHandler;
+import control.handlers.StorageHandler;
 import dialogue.Dialogue;
 import itemData.Item;
 import menus.Menus;
@@ -36,7 +37,6 @@ public class WorldStage {
         int playerID = addChar(
                 GameCharGen.genChar("resources/object_data/char_data/classes/default_brute.txt"),
                 new int[]{spawn[0], spawn[1]},
-                null,
                 null,
                 false,
                 false
@@ -82,11 +82,10 @@ public class WorldStage {
      * <br> Add all given Item Objects to this gameChar's Storage.
      * @param gameChar The gameChar to be added to the world.
      * @param pos The position of this gameChar's spriteGroup within the world group.
-     * @param items The items to store in the gameChar's Storage.
-     * @param d Given Dialogue Object relating to this GameChar. Can be given null if it has no dialogue.
+     * @param dia Given Dialogue Object relating to this GameChar. Can be given null if it has no dialogue.
      * @return The gameCharacter's ID.
      */
-    public int addChar(GameChar gameChar, int[] pos, Item[] items, Dialogue d, boolean isHostile, boolean isNPC) {
+    public int addChar(GameChar gameChar, int[] pos, Dialogue dia, boolean isHostile, boolean isNPC) {
         final int ID = IDGen.genID();
         gameChar.setID(ID);
         CharSprite sprite;
@@ -110,9 +109,8 @@ public class WorldStage {
         StorageTracker.trackEQSlots(eqSlots);
         if (isNPC) MvmntTracker.trackMvmnt(sprite);
 
-        if (items != null) fillStorage(backpack, items);
-        if (d != null) { // Has dialogue.
-            SpriteBehavior.enableDialogue(sprite, d);
+        if (dia != null) { // Has dialogue.
+            SpriteBehavior.enableDialogue(sprite, dia);
         }
         SpriteTracker.trackSprite(sprite);
 
@@ -151,7 +149,7 @@ public class WorldStage {
      * @param pos The position of the sprite's spriteGroup within the world group.
      * @return The sprite's ID which is linked to its Storage Object as well.
      */
-    public int addStorage(StorageSprite sprite, Item[] items, int[] pos) {
+    public int addStorage(StorageSprite sprite, int[] pos) {
         final int ID = IDGen.genID();
         sprite.setID(ID);
         Storage storage = new Storage();
@@ -160,10 +158,26 @@ public class WorldStage {
         SpriteTracker.trackSprite(sprite);
         StorageTracker.trackStorage(storage);
 
-        if (items != null) fillStorage(storage, items);
-
         world.getGroup().getChildren().add(sprite.getGroup());
         sprite.setPos(pos[0], pos[1]);
+        return ID;
+    }
+
+    /** This method will:
+     * <br> Generate a new ID.
+     * <br> Link the ID to the given item.
+     * <br> Track the item with StorageTracker.
+     * <br> Add the item to the storage with given storageID using StorageTracker.addToStorage().
+     * @param item The item to add to the World.
+     * @param storageID The ID of the Storage to add the item to.
+     * @param amnt The amount of the item to add.
+     * @return The ID of the given item which is linked to its sprites.
+     */
+    public int addItemToStorage(Item item, int storageID, int amnt) {
+        final int ID = IDGen.genID();
+        item.setID(ID);
+        StorageTracker.trackItem(item);
+        StorageHandler.addTo(storageID, item.getID(), amnt);
         return ID;
     }
 
@@ -176,15 +190,13 @@ public class WorldStage {
      * <br> Track the item and sprites with SpriteTracker and StorageTracker.
      * <br> Add item's idleSprite's spriteGroup
      * @param item The item to add to the World.
-     * @param amnt The amount of the item to be added (its amount field, not the amount of sprites).
      * @param pos The item's spriteGroup's position in the world Group.
      * @return The ID of the given item which is linked to its sprites.
      */
-    public int addItemNoStorage(Item item, int amnt, int[] pos) {
+    public int addItemToWorld(Item item, int[] pos) {
         final int ID = IDGen.genID();
         item.setID(ID);
         item.setStorageID(null);
-        item.amnt().set(amnt);
         StorageTracker.trackItem(item);
 
         PickableSprite idleSprite = new PickableSprite(item.getPathToPickableSprite());
@@ -194,14 +206,6 @@ public class WorldStage {
         world.getGroup().getChildren().add(idleSprite.getGroup());
         idleSprite.setPos(pos[0], pos[1]);
         return ID;
-    }
-
-    /** Given Storage Object's ID field must be set before sending it here. */
-    public void fillStorage(Storage strg, Item[] items) {
-        for (int i = 0; i < items.length; ++i) {
-            items[i].setStorageID(strg.getID());
-            strg.store(items[i]);
-        }
     }
 
     public TileSet getWorld() {return world;}

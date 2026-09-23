@@ -4,6 +4,8 @@ import charData.GameChar;
 import charData.Level;
 import charData.attr.CharAttr;
 import charData.stat.CharStats;
+import control.handlers.StorageHandler;
+import control.runtimeTrackers.worldData.StorageTracker;
 import itemData.Item;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.value.ChangeListener;
@@ -138,9 +140,8 @@ public class Menus {
                     toStg = interactor;
                     m = m2;
                 }
-                Item i = fromStg.grabByName(m.selectedItem());
-                fromStg.removeItem(i);
-                toStg.store(i);
+                Item i = fromStg.grabItem(m.selectedItem());
+                StorageHandler.addTo(toStg.getID(), i.getID(), fromStg.getAmntStored(i.getID()));
                 i.setStorageID(toStg.getID());
                 m1.reset();
                 m2.reset();

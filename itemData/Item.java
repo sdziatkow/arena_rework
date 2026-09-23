@@ -10,12 +10,10 @@ import java.util.ArrayList;
 
 /** Basic class for all item data.
  * <br> name: A descriptive name of this item.
- * <br> amount: The amount of this item that a storage has.
  * <br> value: The gold value for each individual item.
  */
 public class Item extends ItemData implements Comparable<Item> {
     private String name;
-    private IntVal amount;
     private IntVal value;
     private StatMod statMod;
 
@@ -29,11 +27,8 @@ public class Item extends ItemData implements Comparable<Item> {
     }
 
     private void setUp() {
-        final int DEFAULT_MAX_AMNT = 10000; // Arbitrary, just make it big.
         final int DEFAULT_MAX_VAL  = 10000; // Arbitrary, just make it big.
-        amount = new IntVal();
         value = new IntVal();
-        amount.setMax(DEFAULT_MAX_AMNT);
         value.setMax(DEFAULT_MAX_VAL);
         statMod = new StatMod();
     }
@@ -51,11 +46,8 @@ public class Item extends ItemData implements Comparable<Item> {
 //GETTERS----------------------------------------------------------------------------------------------------------------
 
     public String getName() {return name;}
-    public IntVal amnt() {return amount;}
     public IntVal val() {return value;}
     public StatMod statMod() {return statMod;}
-
-    public int getTotalValue() {return (amount.get() * value.get()); }
 
     /** This is not an Object field, SHOULD BE STORED IN LOCAL VARIABLE FOR USE. */
     public ArrayList<String> dispInfo() {
@@ -65,9 +57,6 @@ public class Item extends ItemData implements Comparable<Item> {
 
         dispInfo.add("Value");
         dispInfo.add(String.valueOf(value.get()) + "g");
-
-        dispInfo.add("Amount");
-        dispInfo.add(String.valueOf(amount.get()));
 
         for (StatChange c : StatChange.ALL) {
             for (ValType v : ValType.ALL) {
