@@ -1,6 +1,9 @@
 package worldStage;
 
+import control.IDGen;
+import control.runtimeTrackers.worldData.StorageTracker;
 import dialogue.DialogueMaker;
+import itemData.Item;
 import itemData.usables.StatPot;
 import itemData.weapons.Weapon;
 import spriteData.backgroundSprite.StorageSprite;
@@ -18,15 +21,14 @@ public class WorldMaker {
         world.addChar(
                 GameCharGen.genChar("resources/object_data/char_data/log.txt"),
                 new int[]{spawn[0], spawn[1] + 100},
-                null,
                 DialogueMaker.makeDialogue("resources/object_data/char_data/dialogue/log.txt"),
                 false,
                 true
         );
 
-        world.addChar(GameCharGen.genChar("resources/object_data/char_data/test_enemy.txt"),
+        world.addChar(
+                GameCharGen.genChar("resources/object_data/char_data/test_enemy.txt"),
                 new int[]{spawn[0], spawn[1] + 400},
-                null,
                 null,
                 true,
                 true
@@ -37,23 +39,26 @@ public class WorldMaker {
                 new int[]{spawn[0] + 100, spawn[1]}
         );
 
-        world.addStorage(
+        int chestID = world.addStorage(
                 new StorageSprite("file:resources/sprites/bg_sprites/chest/open_1x3_20x20.png"),
-                null,
                 new int[]{spawn[0] - 50, spawn[1] - 50}
         );
+        world.addItemToStorage(
+            ItemGen.genItem("resources/object_data/item_data/usable_data/statpot_data/hp_pot.txt", new StatPot()),
+            chestID,
+            10
+        );
 
-        world.addItemNoStorage(
+        world.addItemToWorld(
                 ItemGen.genItem("resources/object_data/item_data/wpn_data/steel_sword.txt", new Weapon()),
-                1,
                 new int[]{spawn[0] - 50, spawn[1]}
         );
-        world.addItemNoStorage(
+        world.addItemToWorld(
           ItemGen.genItem("resources/object_data/item_data/usable_data/statpot_data/hp_pot.txt", new StatPot()),
-          1,
           new int[] {spawn[0] - 50, spawn[1] + 80}
         );
         world.setUpStatBars();
+
         return world;
     }
 }

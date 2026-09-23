@@ -2,104 +2,107 @@ package storageData;
 
 import control.ArenaObject;
 import itemData.Item;
-import itemData.armors.Armor;
-import itemData.usables.Usable;
-import itemData.weapons.Weapon;
-import java.util.ArrayList;
+import itemData.ItemType;
 
+import java.util.Arrays;
+import java.util.HashMap;
+
+/**
+ * For storing items in one location.
+ */
 public class Storage extends ArenaObject {
-    private ArrayList<Item>[] items;
+    private HashMap<ItemType, HashMap<Integer, StoredItem>> items;
 
-    @SuppressWarnings("Unchecked cast")
     public Storage() {
-        final int TOTAL_ITEM_TYPES = 4; // Weapon, Armor, Usable, all.
-        items = (ArrayList<Item>[]) new ArrayList[TOTAL_ITEM_TYPES];
-        for (int i = 0; i < items.length; ++i) {
-            items[i] = new ArrayList<>();
+        items = new HashMap<>();
+        for (ItemType t : ItemType.getTypes()) {
+            items.put(t, new HashMap<>());
         }
     }
 
-    /** @return ArrayList of all Weapon Objects in this storage. */
-    public ArrayList<Item> wpn() { return items[0]; }
+    public int getAmntStored(Integer itemID) {
+        return items.get(ItemType.ALL).get(itemID).amnt().get();
+    }
 
-    /** @return ArrayList of all Armor Objects in this storage. */
-    public ArrayList<Item> arm() { return items[1]; }
-
-    /** @return ArrayList of all Usable Objects in this storage. */
-    public ArrayList<Item> use() { return items[2]; }
-
-    /** @return ArrayList of all Item Objects in this storage. */
-    public ArrayList<Item> all() { return items[3]; }
-
-    /**
-     *
-     * @param i The item to find the correct list for.
-     * @return The list that stores Items of the given Item's type.
-     */
-    private ArrayList<Item> getList(Item i) {
-        ArrayList<Item> type = null;
-        if      (i instanceof Weapon w) type = wpn();
-        else if (i instanceof Armor a)  type = arm();
-        else if (i instanceof Usable u) type = use();
-        if (type == null) throw new IllegalArgumentException("Given Item is not of any instantiable type.");
-        return type;
+    public Item[] getItems(ItemType t) {
+        StoredItem[] stored = items.get(t).values().toArray(new StoredItem[0]);
+        return Arrays.stream(stored).map(StoredItem::item).toArray(Item[]::new);
     }
 
 //STORE-ITEMS------------------------------------------------------------------------------------------------------------
 
-    public void store(Item i) {
-        if (i == null) return;
-        ArrayList<Item> list = getList(i);
-        Item existing = grabByName(i.getName());
-
-        if (existing == null) { // Item does not exist in this storage.
-            list.add(i);
-            all().add(i);
+    /**
+     * Stores given amnt of given item.
+     * If Item is already being stored, add to its amnt by given amnt.
+     * @param i The item to add to this Storage.
+     * @param amnt The amount to add.
+     */
+    public void store(Item i, int amnt) {
+        if (hasItem(i.getID())) {
+            items.get(ItemType.typeOf(i)).get(i.getID()).amnt().inc(amnt);
         }
-        else { // Item does exist in storage.
-            existing.amnt().inc(i.amnt().get());
+        else{
+            StoredItem toStore = new StoredItem(i, amnt);
+            items.get(ItemType.typeOf(i)).put(i.getID(), toStore);
+            items.get(ItemType.ALL).put(i.getID(), toStore);
         }
     }
 
 //REMOVE-ITEMS-----------------------------------------------------------------------------------------------------------
 
-    public void removeItem(Item item) {
-        ArrayList<Item> list = getList(item);
-        for (int i = 0; i < list.size(); ++i) {
-            Item currItem = list.get(i);
-            int cmp = currItem.compareTo(item);
-            if (cmp == 0) {
-                list.remove(currItem);
-                list.trimToSize();
-                all().remove(currItem);
-                all().trimToSize();
-                currItem = null;
-                return;
-            }
+    /**
+     * Removes given amount of given item.
+     * If no more of the item remains, it will be removed from the storage.
+     * @param itemID The ID of the item to be removed.
+     * @param amnt The amount to remove.
+     * @return True if the item is still in this Storage Object.
+     */
+    public boolean removeItem(Integer itemID, int amnt) {
+        StoredItem removing = items.get(ItemType.ALL).get(itemID);
+        removing.amnt().dec(amnt);
+        if (removing.amnt().isMin()) {
+            removeItem(itemID);
+            return false;
         }
+        return true;
     }
 
     /**
-     * Checks for default ordering (COMPARES NAMES) to find if given item in this list.
-     * @return The item in the given list whose name matches the given item
-     * @see Item
+     * Removes all of the given item from this storage.
+     * @param itemID The ID of the item to be removed.
      */
-    public Item grabByName(String itemName) {
-        for (int i = 0; i < all().size(); ++i) {
-            Item currItem = all().get(i);
-            int cmp = currItem.getName().compareTo(itemName);
-            if (cmp == 0) return currItem;
-        }
-        return null;
+    public void removeItem(Integer itemID) {
+        StoredItem removing = items.get(ItemType.ALL).get(itemID);
+        items.get(ItemType.typeOf(removing.item())).remove(itemID);
+        items.get(ItemType.ALL).remove(itemID);
+    }
+
+    /** @return StoredItem Object whose Item field has the given itemID */
+    private StoredItem grabStoredItem(Integer itemID) {
+        return items.get(ItemType.ALL).get(itemID);
+    }
+
+    /**
+     * @param itemID The ID of the Item Object that should be returned.
+     * @return The Item Object with given itemID.
+     */
+    public Item grabItem(Integer itemID) {
+        if (!hasItem(itemID)) return null;
+        return grabStoredItem(itemID).item();
     }
 
 //FLAGS------------------------------------------------------------------------------------------------------------------
 
     /** @return True if this storage contains exactly zero items. */
     public boolean isEmpty() {
-        for (int i = 0; i < items.length; ++i) {
-            if (!items[i].isEmpty()) return false;
+        boolean empty = true;
+        for (ItemType t : ItemType.getTypes()) {
+            if (!items.get(t).isEmpty()) empty = false;
         }
-        return true;
+        return empty;
+    }
+
+    public boolean hasItem(Integer itemID) {
+        return grabStoredItem(itemID) != null;
     }
 }

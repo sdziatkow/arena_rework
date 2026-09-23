@@ -1,7 +1,6 @@
 package charData.stat;
 import charData.attr.Attr;
 import charData.attr.CharAttr;
-import values.ValType;
 import java.util.HashMap;
 
 import static values.ValType.MAX;
@@ -42,6 +41,27 @@ public enum Stat {
             if (s.equals(CRIT) || s.equals(DODGE)) {statVal /= 500;}
             if (isVital(s)) stats.setMaxVal(s, statVal);
             else stats.setVal(s, statVal);
+        }
+        genRegenFromAttr(stats, attrVals);
+    }
+
+    /**
+     * This method will set each REGEN_VAL based on the given attrVals.
+     * @param stats CharStat Object whose REGEN_VALS will be generated.
+     * @param attrVals Attr values that the REGEN_VALS will be generated from.
+     */
+    public static void genRegenFromAttr(CharStats stats, CharAttr attrVals) {
+        for (Stat s : Stat.VITALS) {
+            HashMap<Attr, Double> attrScaling = getAttrScalings(s);
+            double statVal = 0.0;
+            for (Attr a : attrScaling.keySet()) { // Compute each scaling and add it to statVal.
+                double scale = attrScaling.get(a);
+                double attrVal = attrVals.get(a, VAL);
+                double attrMax = attrVals.get(a, MAX);
+                statVal += computeScaling(scale, attrVal, attrMax);
+            }
+            statVal /= 4000.00;
+            stats.setRegenVal(s, statVal);
         }
     }
 

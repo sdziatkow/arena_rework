@@ -23,6 +23,7 @@ import storageData.Storage;
 import worldData.WorldData;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -33,7 +34,8 @@ public class StorageMenu {
     public GridPane itemDisp;
     private ArrayList<Button> itemBtns;
     private Storage stg;
-    private String selectedItem;
+    private Integer selectedItemID;
+    HashMap<Integer, Integer> itemIDs;
 
 //LISTENERS--------------------------------------------------------------------------------------------------------------
 
@@ -47,38 +49,25 @@ public class StorageMenu {
 
             ObservableList<String> items = FXCollections.observableArrayList();
             ItemType type = ItemType.valueOf(selected);
-            switch (type) {
-                case WEAPON:
-                    items.addAll(itemNames(stg.wpn().toArray(new Item[0])));
-                    break;
-                case ARMOR:
-                    items.addAll(itemNames(stg.arm().toArray(new Item[0])));
-                    break;
-                case USABLE:
-                    items.addAll(itemNames(stg.use().toArray(new Item[0])));
-                    break;
-                case ALL:
-                    items.addAll(itemNames(stg.all().toArray(new Item[0])));
-                    break;
-                default: break;
-            }
+            items.addAll(itemNames(stg.getItems(type)));
             itemList.setItems(items);
         }
     };
 
-    private final ChangeListener<String> onItemSelected = new ChangeListener<String>() {
+    private final ChangeListener<Number> onItemSelected = new ChangeListener<Number>() {
         @Override
-        public void changed(ObservableValue<? extends String> observableValue, String prev, String selected) {
-            selectedItem = selected;
+        public void changed(ObservableValue<? extends Number> observableValue, Number prev, Number selected) {
+            selectedItemID = itemIDs.get(selected.intValue());
             itemDisp.getChildren().clear();
-            if (selected == null) return;
-            else createItemDisp(selected);
+            if (selectedItemID == null) return;
+            else createItemDisp();
         }
     };
 
 //CONSTRUCTOR------------------------------------------------------------------------------------------------------------
 
     public StorageMenu(Storage s, boolean useEQBtn) {
+        itemIDs = new HashMap<>();
         stg = s;
         main = new GridPane();
         typeList = new ListView<>();
@@ -97,7 +86,7 @@ public class StorageMenu {
                     if (src.equals(EQAction.dispInfo(EQAction.EQUIP))) {
                         EquipHandler.handleEquip(
                             stg.getID(),
-                            stg.grabByName(selectedItem).getID(),
+                            stg.grabItem(selectedItemID).getID(),
                             WorldLocation.STORAGE,
                             EQAction.EQUIP
                         );
@@ -106,7 +95,7 @@ public class StorageMenu {
                     else if (src.equals(EQAction.dispInfo(EQAction.UN_EQUIP))) {
                         EquipHandler.handleEquip(
                             stg.getID(),
-                            stg.grabByName(selectedItem).getID(),
+                            stg.grabItem(selectedItemID).getID(),
                             WorldLocation.STORAGE,
                             EQAction.UN_EQUIP
                         );
@@ -117,11 +106,15 @@ public class StorageMenu {
             eqBtn.setOnAction(onEq);
             addBtnToItemDisp(eqBtn);
         }
+        typeList.getSelectionModel().select(0);
     }
 
     public void reset() {
+        itemIDs.clear();
         main.getChildren().clear();
         setUpTypeList();
+        typeList.getSelectionModel().select(typeList.getSelectionModel().getSelectedIndex());
+
     }
 
 //ITEM-TYPE-LIST-VIEW----------------------------------------------------------------------------------------------------
@@ -134,7 +127,7 @@ public class StorageMenu {
         typeList.setPrefHeight(25.0);
 
         itemList.selectionModelProperty().get().selectionModeProperty().set(SelectionMode.SINGLE);
-        itemList.getSelectionModel().selectedItemProperty().addListener(onItemSelected);
+        itemList.getSelectionModel().selectedIndexProperty().addListener(onItemSelected);
 
         main.add(typeList, 0, 0);
         main.add(itemList, 0, 1);
@@ -153,20 +146,25 @@ public class StorageMenu {
 //ITEMS-OF-SELECTED-TYPE-------------------------------------------------------------------------------------------------
 
     private ObservableList<String> itemNames(Item[] n) {
+
         ObservableList<String> items = FXCollections.observableArrayList();
         for (int i = 0; i < n.length; ++i) {
-            items.add(n[i].getName());
+            String name = n[i].getName() + " x" + stg.getAmntStored(n[i].getID());
+            items.add(name);
+            itemIDs.putIfAbsent(i, n[i].getID());
         }
         return items;
     }
 
 //INDIVIDUAL-ITEM--------------------------------------------------------------------------------------------------------
 
-    public void createItemDisp(String itemName) {
-        Item i = stg.grabByName(itemName);
-        ImageView img = new ImageView(FrameGen.genOneFrame(i.getPathToPickableSprite()));
+    public void createItemDisp() {
+        Item i = stg.grabItem(selectedItemID);
 
-        itemDisp.add(img, 0, 0, 2, 1);
+        if (i.getPathToPickableSprite() != null) {
+            ImageView img = new ImageView(FrameGen.genOneFrame(i.getPathToPickableSprite()));
+            itemDisp.add(img, 0, 0, 2, 1);
+        }
 
         ArrayList<String> dispInfo = i.dispInfo();
         for (int n = 2; n < dispInfo.size(); ++n) {
@@ -188,7 +186,7 @@ public class StorageMenu {
         }
     }
 
-    public String selectedItem() {return selectedItem;}
+    public Integer selectedItem() {return selectedItemID;}
 
     public void addBtnToItemDisp(Button btn) {
         itemBtns.add(btn);
