@@ -13,6 +13,7 @@ import worldState.WorldState;
 
 import static collision.ColType.HITBOX;
 import static collision.ColType.WORLDBOX;
+import static control.runtimeTrackers.spriteData.SpriteType.WEAPON;
 
 public class CombatSprite extends CharSprite implements Combatant {
     private FourWaySprite attkSprite;
@@ -104,13 +105,13 @@ public class CombatSprite extends CharSprite implements Combatant {
 
     @Override
     public void setWPSprite(WeaponSprite s) {
-        SpriteTracker.removeSprite(wpSprite);
+        SpriteTracker.remove(WEAPON, wpSprite.getID());
         getPane().getChildren().remove(wpSprite.getGroup());
         wpSprite = s;
         wpSprite.setID(getID());
         getPane().getChildren().add(wpSprite.getGroup());
         wpSprite.getFrame().setVisible(false);
-        SpriteTracker.trackSprite(wpSprite);
+        SpriteTracker.add(wpSprite);
         setUpWPAnim();
     }
 

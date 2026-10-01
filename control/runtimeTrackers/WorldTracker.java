@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-
 public class WorldTracker {
     private static final HashMap<WorldEntity, HashMap<Integer, ArenaObject>> all = new HashMap<>();
 

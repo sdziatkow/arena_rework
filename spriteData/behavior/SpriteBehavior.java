@@ -3,10 +3,10 @@ package spriteData.behavior;
 import collision.BoxSizer;
 import collision.ColType;
 import collision.CollisionBox;
-import control.runtimeTrackers.WorldEntity;
 import control.runtimeTrackers.WorldTracker;
 import dialogue.Dialogue;
 import movement.NPCState;
+import movement.npcMvmnt.NPCMvmnt;
 import spriteData.charSprite.CharSprite;
 import spriteData.charSprite.CombatSprite;
 import static collision.ColType.*;
@@ -14,14 +14,14 @@ import static control.runtimeTrackers.WorldEntity.DIALOGUE;
 
 public class SpriteBehavior {
 
-    public static void enableHostility(CombatSprite sprite) {
+    public static void enableHostility(CombatSprite sprite, NPCMvmnt npcMvmnt) {
         sprite.addBox(new CollisionBox(DETECTBOX));
         sprite.getGroup().getChildren().add(sprite.getBox(DETECTBOX).getColBox());
         double factor = 10.0;
         BoxSizer.sizeBoxEvenlyBiggerThan(sprite.getBox(DETECTBOX), sprite.getBox(WORLDBOX), factor);
         sprite.getBox(DETECTBOX).getColBox().setX(-factor * 2);
         sprite.getBox(DETECTBOX).getColBox().setY(-factor * 2);
-        sprite.setNPCState(NPCState.HUNTING);
+        npcMvmnt.setState(NPCState.HUNTING);
         //sprite.getBox(DETECTBOX).getColBox().setOpacity(1);
     }
 

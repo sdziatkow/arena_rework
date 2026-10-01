@@ -13,7 +13,6 @@ import worldState.WorldState;
 import static collision.ColType.*;
 
 public class CharSprite extends MovingSprite implements Hurtable, Interactable {
-    private NPCState npcState;
     private StatBar statBar;
 
     public CharSprite() {
@@ -26,7 +25,6 @@ public class CharSprite extends MovingSprite implements Hurtable, Interactable {
 
     private void setUp(String pathToSheet) {
         setMaxSpeed(1.5);
-        npcState = NPCState.FREE;
         addBox(new CollisionBox(WORLDBOX));
         addBox(new CollisionBox(HURTBOX));
 
@@ -42,10 +40,8 @@ public class CharSprite extends MovingSprite implements Hurtable, Interactable {
         getGroup().getChildren().add(getBox(CHECKBOX).getColBox());
     }
 
-    public NPCState getNPCState() { return npcState; }
     public StatBar getStatBar() { return statBar; }
 
-    public void setNPCState(NPCState s) { npcState = s; }
     public void setStatBar(StatBar bar) {
         statBar = bar;
         getGroup().getChildren().add(bar.get());

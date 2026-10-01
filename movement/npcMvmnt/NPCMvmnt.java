@@ -38,7 +38,7 @@ public class NPCMvmnt {
 
     public NPCMvmnt(CharSprite s) {
         sprite = s;
-        state = sprite.getNPCState();
+        state = NPCState.FREE;
         movingTo = null;
         mvCount = new IntVal();
         mvCount.setMax(40);
@@ -46,6 +46,9 @@ public class NPCMvmnt {
         cmbtMvCount.setMax(10);
         mvGen = 10;
     }
+
+    public void setState(NPCState s) {state = s;}
+    public NPCState getState() {return state;}
 
 //STATE-MACHINE----------------------------------------------------------------------------------------------------------
 

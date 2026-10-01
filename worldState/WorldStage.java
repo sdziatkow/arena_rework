@@ -4,6 +4,7 @@ import charData.GameChar;
 import control.IDGen;
 import control.handlers.StatChangeHandler;
 import control.objectGen.gameObjects.DialogueMaker;
+import control.runtimeTrackers.WorldEntity;
 import control.runtimeTrackers.WorldTracker;
 import itemData.Item;
 import javafx.geometry.Bounds;
@@ -23,6 +24,7 @@ import control.runtimeTrackers.spriteData.MvmntTracker;
 import control.runtimeTrackers.spriteData.SpriteTracker;
 
 import static control.runtimeTrackers.WorldEntity.*;
+import static control.runtimeTrackers.spriteData.SpriteType.*;
 
 /**
  * For instantiating Game Entities and creating a playable world space.
@@ -87,13 +89,15 @@ public class WorldStage {
         if (gameChar.getPathToAttkSheet() != null) {
             sprite = new CombatSprite(gameChar.getPathToMvSheet(), gameChar.getPathToAttkSheet());
             ((CombatSprite)sprite).getWPSprite().setID(gcID);
-            if (isHostile) SpriteBehavior.enableHostility((CombatSprite)sprite);
         }
         else sprite = new CharSprite(gameChar.getPathToMvSheet());
         sprite.setID(gcID);
+        SpriteTracker.add(sprite);
+        if (isNPC) MvmntTracker.trackMvmnt(sprite);
         if (gameChar.getPathToDialogue() != null) {
             SpriteBehavior.enableDialogue(sprite, DialogueMaker.makeDialogue(gameChar.getPathToDialogue()));
         }
+        if (isHostile) SpriteBehavior.enableHostility((CombatSprite)sprite, MvmntTracker.allNPCMvmnts.get(gcID));
 
         EQSlots eqSlots = new EQSlots();
         eqSlots.setID(gcID);
@@ -101,8 +105,6 @@ public class WorldStage {
         WorldTracker.add(GAME_CHAR, gameChar);
         WorldTracker.add(STORAGE, backpack);
         WorldTracker.add(EQ_SLOTS, eqSlots);
-        SpriteTracker.trackSprite(sprite);
-        if (isNPC) MvmntTracker.trackMvmnt(sprite);
 
         StatChangeHandler.updateStatsFromAttr(gcID);
         getBG().getChildren().add(sprite.getGroup());
@@ -122,7 +124,7 @@ public class WorldStage {
     public int addStaticSprite(StaticSprite sprite, int[] pos) {
         final int ID = IDGen.genID();
         sprite.setID(ID);
-        SpriteTracker.trackSprite(sprite);
+        SpriteTracker.add(sprite);
 
         getBG().getChildren().add(sprite.getGroup());
         setPosRelativeToSpawn(sprite, pos);
@@ -145,8 +147,8 @@ public class WorldStage {
         stg.setID(ID);
         sprite.setID(ID);
 
-        WorldTracker.add(STORAGE, stg);
-        SpriteTracker.trackSprite(sprite);
+        WorldTracker.add(WorldEntity.STORAGE, stg);
+        SpriteTracker.add(sprite);
 
         getBG().getChildren().add(sprite.getGroup());
         setPosRelativeToSpawn(sprite, pos);
@@ -170,12 +172,12 @@ public class WorldStage {
         item.setStorageID(null);
         WorldTracker.add(ITEM, item);
 
-        PickableSprite idleSprite = new PickableSprite(item.getPathToPickableSprite());
-        idleSprite.setID(ID);
-        SpriteTracker.trackSprite(idleSprite);
+        PickableSprite pickableSprite = new PickableSprite(item.getPathToPickableSprite());
+        pickableSprite.setID(ID);
+        SpriteTracker.add(pickableSprite);
 
-        getBG().getChildren().add(idleSprite.getGroup());
-        setPosRelativeToSpawn(idleSprite, pos);
+        getBG().getChildren().add(pickableSprite.getGroup());
+        setPosRelativeToSpawn(pickableSprite, pos);
         return ID;
     }
 }
