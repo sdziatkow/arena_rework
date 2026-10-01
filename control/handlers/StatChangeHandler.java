@@ -5,11 +5,13 @@ import charData.attr.Attr;
 import charData.stat.Stat;
 import charData.statMods.StatChange;
 import charData.statMods.StatMod;
+import control.runtimeTrackers.WorldTracker;
 import control.runtimeTrackers.spriteData.SpriteTracker;
-import control.runtimeTrackers.worldData.StatTracker;
 import spriteData.behavior.boxes.Movable;
 import spriteData.charSprite.CombatSprite;
 import values.ValType;
+
+import static control.runtimeTrackers.WorldEntity.GAME_CHAR;
 
 /**
  * Handles all of the following during run-time:
@@ -24,8 +26,7 @@ public class StatChangeHandler {
      * @param gameCharID The GameChar Object whose CharStats should be updated to reflect their CharAttr values.
      */
     public static void updateStatsFromAttr(Integer gameCharID) {
-        GameChar g = StatTracker.gameChars.get(gameCharID);
-        if (g == null) return;
+        GameChar g = (GameChar)WorldTracker.get(GAME_CHAR, gameCharID);
         Stat.genStatsFromAttr(g.stats(), g.attr());
         updateAttkSpeed(gameCharID);
         updateMoveSpeed(gameCharID);
@@ -33,7 +34,8 @@ public class StatChangeHandler {
 
     //TODO: needs more testing for how much it effects it. (if it affects it at all)
     public static void updateAttkSpeed(int gameCharID) {
-        double gSpeed = StatTracker.gameChars.get(gameCharID).stats().get(Stat.SPEED, ValType.VAL);
+        GameChar g = (GameChar)WorldTracker.get(GAME_CHAR, gameCharID);
+        double gSpeed = g.stats().get(Stat.SPEED, ValType.VAL);
         CombatSprite sprite = SpriteTracker.combatSprites.get(gameCharID);
         if (sprite == null) return;
         double attkSpeed = ((gSpeed * 1.5) / (100.0 + (gSpeed / 2.0)));
@@ -42,7 +44,8 @@ public class StatChangeHandler {
     }
 
     public static void updateMoveSpeed(int gameCharID) {
-        double gSpeed = StatTracker.gameChars.get(gameCharID).stats().get(Stat.SPEED, ValType.VAL);
+        GameChar g = (GameChar)WorldTracker.get(GAME_CHAR, gameCharID);
+        double gSpeed = g.stats().get(Stat.SPEED, ValType.VAL);
         Movable sprite = SpriteTracker.movables.get(gameCharID);
         if (sprite == null) return;
         double mvSpeed = 0.5 + (gSpeed / (100.0 + (gSpeed / 8)));
@@ -50,8 +53,7 @@ public class StatChangeHandler {
     }
 
     public static void applyStatMod(Integer gameCharID, StatMod mod) {
-        GameChar g = StatTracker.gameChars.get(gameCharID);
-        if (g == null) return;
+        GameChar g = (GameChar)WorldTracker.get(GAME_CHAR, gameCharID);
         applyStatChanges(g, mod);
         updateStatsFromAttr(gameCharID);
     }

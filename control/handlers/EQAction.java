@@ -9,4 +9,8 @@ public enum EQAction {
     public static String dispInfo(EQAction action) {
         return dispInfo[action.ordinal()];
     }
+    public static EQAction oppositeOf(EQAction action) {
+        if (action == EQUIP) return UN_EQUIP;
+        else return EQUIP;
+    }
 }

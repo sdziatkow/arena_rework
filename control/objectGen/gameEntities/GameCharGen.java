@@ -1,22 +1,11 @@
-package control.objectGen;
+package control.objectGen.gameEntities;
 
 import charData.CharClass;
 import charData.GameChar;
-import charData.attr.Attr;
-import charData.stat.Stat;
-import control.ArenaObject;
-import control.handlers.StatChangeHandler;
-import itemData.Item;
-import itemData.ItemType;
-import itemData.armors.Armor;
-import itemData.usables.Usable;
-import itemData.weapons.Weapon;
-import storageData.Storage;
+import control.objectGen.ObjectDataParser;
+import control.objectGen.ObjectType;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.HashMap;
-import java.util.Scanner;
 
 public class GameCharGen {
 
@@ -38,6 +27,9 @@ public class GameCharGen {
                 break;
             case "attkSheet":
                 c.setPathToAttkSheet(val);
+                break;
+            case "dialogue":
+                c.setPathToDialogue(val);
                 break;
             case "name":
                 c.setName(val);

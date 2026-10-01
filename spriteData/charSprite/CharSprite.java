@@ -8,7 +8,7 @@ import movement.NPCState;
 import spriteData.MovingSprite;
 import spriteData.behavior.boxes.Hurtable;
 import spriteData.behavior.boxes.Interactable;
-import worldData.WorldData;
+import worldState.WorldState;
 
 import static collision.ColType.*;
 
@@ -59,6 +59,6 @@ public class CharSprite extends MovingSprite implements Hurtable, Interactable {
 
     @Override
     public void onInteract(int interactorID) {
-        WorldData.openDialogueMenu(getID());
+        WorldState.openDialogueMenu(getID());
     }
 }

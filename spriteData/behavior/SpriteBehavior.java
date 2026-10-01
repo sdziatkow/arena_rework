@@ -3,12 +3,14 @@ package spriteData.behavior;
 import collision.BoxSizer;
 import collision.ColType;
 import collision.CollisionBox;
+import control.runtimeTrackers.WorldEntity;
+import control.runtimeTrackers.WorldTracker;
 import dialogue.Dialogue;
 import movement.NPCState;
 import spriteData.charSprite.CharSprite;
 import spriteData.charSprite.CombatSprite;
-import control.runtimeTrackers.worldData.DialogueTracker;
 import static collision.ColType.*;
+import static control.runtimeTrackers.WorldEntity.DIALOGUE;
 
 public class SpriteBehavior {
 
@@ -28,7 +30,7 @@ public class SpriteBehavior {
         BoxSizer.sizeBoxEvenlyBiggerThan(sprite.getBox(ColType.INTERACTBOX), sprite.getBox(ColType.WORLDBOX), 2.0);
         sprite.getGroup().getChildren().add(sprite.getBox(ColType.INTERACTBOX).getColBox());
         d.setID(sprite.getID());
-        DialogueTracker.addDialogue(d);
+        WorldTracker.add(DIALOGUE, d);
         //sprite.getBox(INTERACTBOX).getColBox().setOpacity(1);
     }
 }

@@ -1,12 +1,10 @@
-package control.objectGen;
+package control.objectGen.gameEntities;
 
+import control.objectGen.ObjectDataParser;
+import control.objectGen.ObjectType;
 import spriteData.backgroundSprite.StaticSprite;
-import spriteData.backgroundSprite.StorageSprite;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.HashMap;
-import java.util.Scanner;
 
 public class StaticSpriteGen {
 

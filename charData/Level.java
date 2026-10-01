@@ -4,7 +4,6 @@ import charData.attr.Attr;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import values.IntVal;
-import worldData.WorldData;
 
 /** A representation of a game character's Level and its values.
  * @see Attr

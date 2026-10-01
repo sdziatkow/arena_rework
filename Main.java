@@ -1,70 +1,54 @@
 import charData.GameChar;
 import charData.attr.Attr;
-import charData.stat.Stat;
-import charData.statMods.StatMod;
+import control.ArenaObject;
 import control.Controller;
 import control.handlers.StatChangeHandler;
+import control.runtimeTrackers.WorldTracker;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
-import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import menus.Menus;
-import movement.CharMvmnt;
-import tileSet.TileSetMaker;
-import worldData.WorldData;
+import worldState.WorldState;
 import control.runtimeTrackers.spriteData.SpriteTracker;
-import control.runtimeTrackers.worldData.StatTracker;
-import worldStage.WorldMaker;
-import worldStage.WorldStage;
+
+import java.util.HashSet;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static worldData.WorldData.cam;
+import static control.runtimeTrackers.WorldEntity.GAME_CHAR;
 
 public class Main extends Application {
 
     /** Runs before start **/
     public void init() {
-        WorldStage world = WorldMaker.makeWorld(TileSetMaker.makeTileSet("resources/object_data/tile_set_data/grass_area.txt"));
-        WorldData.bg = world.getWorld();
-        WorldData.bg.getGroup().getChildren().add(Menus.overlay);
-        WorldData.bg.getGroup().setCache(true);
+        WorldState.stageWorld("testWorld");
+        WorldState.scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent keyEvent) {Controller.onKeyDown(keyEvent.getCode());}
+        });
+        WorldState.scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent keyEvent) { Controller.onKeyRelease(keyEvent.getCode());}
+        });
+        WorldState.scene.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {Controller.onMouseBtnPressed(mouseEvent);}
+        });
+        WorldState.scene.setOnMouseReleased(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {Controller.onMouseBtnReleased(mouseEvent);}
+        });
     }
 
     @Override
     public void start(Stage stage) {
         final Stage s = stage;
-        Scene sc = new Scene(WorldData.bg.getGroup(), 3000, 3000, true);
-        sc.setCamera(cam);
-        cam.setCache(true);
-        Menus.overlay.getChildren().add(cam);
-        Menus.overlay.setCache(true); // Must have this or else will not render correctly.
-        CharMvmnt.bindNode(SpriteTracker.charSprites.get(SpriteTracker.playerID), Menus.overlay);
-
-        s.setScene(sc);
-        s.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
-                @Override
-                public void handle(KeyEvent keyEvent) { Controller.onKeyDown(keyEvent.getCode());}
-            }
-        );
-        s.getScene().setOnKeyReleased(new EventHandler<KeyEvent>() {
-                 @Override
-                 public void handle(KeyEvent keyEvent) { Controller.onKeyRelease(keyEvent.getCode());}
-             }
-        );
-        s.getScene().setOnMousePressed(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {Controller.onMouseBtnPressed(mouseEvent);}
-        });
-        s.getScene().setOnMouseReleased(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {Controller.onMouseBtnReleased(mouseEvent);}
-        });
+        s.setScene(WorldState.scene);
 
         s.widthProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -87,22 +71,19 @@ public class Main extends Application {
         s.show();
 
     //TESTING------------------------------------------------------------------------------------------------------------
-        SpriteTracker.charSprites.get(SpriteTracker.playerID).setMaxSpeed(1.5);
-        StatTracker.gameChars.get(SpriteTracker.playerID).lvl().incAttrPoints(100);
-        StatTracker.gameChars.forEach((Integer id, GameChar c) -> {
-            c.stats().healVitals(50);
+        SpriteTracker.charSprites.get(WorldState.playerID).setMaxSpeed(1.5);
+        ((GameChar)WorldTracker.get(GAME_CHAR, WorldState.playerID)).lvl().incAttrPoints(100);
+        ((GameChar)WorldTracker.get(GAME_CHAR, WorldState.playerID)).attr().skillUp(Attr.AGILITY, 100);
+        StatChangeHandler.updateStatsFromAttr(WorldState.playerID);
+        WorldTracker.getAll(GAME_CHAR).forEach((ArenaObject g) -> {
+            ((GameChar)g).stats().healVitals(50);
         });
-        StatTracker.gameChars.get(SpriteTracker.playerID).stats().damage(Stat.SP, 50.0);
-        StatTracker.gameChars.get(SpriteTracker.playerID).stats().damage(Stat.HP, 50.0);
-        //StatTracker.gameChars.get(SpriteTracker.playerID).attr().skillUp(Attr.AGILITY, 100);
-        StatChangeHandler.updateStatsFromAttr(SpriteTracker.playerID);
-
 
         Timer gameTimer = new Timer();
         gameTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                Platform.runLater(WorldData::run);
+                Platform.runLater(WorldState::run);
             }
         }, 0, 32);
     }

@@ -3,7 +3,7 @@ package spriteData.backgroundSprite;
 import collision.BoxSizer;
 import collision.CollisionBox;
 import spriteData.behavior.boxes.Interactable;
-import worldData.WorldData;
+import worldState.WorldState;
 
 import static collision.ColType.WORLDBOX;
 import static collision.ColType.INTERACTBOX;
@@ -32,7 +32,7 @@ public class PickableSprite extends StaticSprite implements Interactable {
 
     @Override
     public void onInteract(int interactorID) {
-        WorldData.onItemPickedUp(interactorID, getID());
+        WorldState.onItemPickedUp(interactorID, getID());
     }
 
 }

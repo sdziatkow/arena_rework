@@ -2,13 +2,15 @@ package control.handlers;
 
 import charData.GameChar;
 import charData.stat.Stat;
+import control.runtimeTrackers.WorldTracker;
 import itemData.weapons.Weapon;
-import control.runtimeTrackers.worldData.StatTracker;
-import control.runtimeTrackers.worldData.StorageTracker;
+import storageData.EQSlots;
 
 import java.util.Random;
 
 import static charData.stat.Stat.*;
+import static control.runtimeTrackers.WorldEntity.EQ_SLOTS;
+import static control.runtimeTrackers.WorldEntity.GAME_CHAR;
 import static values.ValType.VAL;
 
 /**
@@ -20,9 +22,9 @@ public abstract class AttkHandler {
     private final static double MAX_ACCURACY = 200.0;
 
     public static void handleAttk(Integer attkerID, Integer hurtID) {
-        Weapon wpn = (Weapon)StorageTracker.eqSlots.get(attkerID).wpn();
-        GameChar attker = StatTracker.gameChars.get(attkerID);
-        GameChar hurter = StatTracker.gameChars.get(hurtID);
+        Weapon wpn = (Weapon)((EQSlots)WorldTracker.get(EQ_SLOTS, attkerID)).wpn();
+        GameChar attker = (GameChar)WorldTracker.get(GAME_CHAR, attkerID);
+        GameChar hurter = (GameChar)WorldTracker.get(GAME_CHAR, hurtID);
         if (hurter == null) return;
         if (wpn == null) {
             hurter.stats().damage(HP, 1.0);

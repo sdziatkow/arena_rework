@@ -1,28 +1,21 @@
-package dialogue;
+package control.objectGen.gameObjects;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import control.objectGen.ObjectDataParser;
+import dialogue.Dialogue;
+
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class DialogueMaker {
 
     public static Dialogue makeDialogue(String pathToData) {
-        try { // Get the file set up.
-            FileInputStream inFile = new FileInputStream(pathToData);
-            Scanner scn = new Scanner(inFile);
-            scn.useDelimiter("[|]|\\n");
-            Dialogue d = new Dialogue();
-            while (scn.hasNext()) {
-                String currField = scn.next();
-                String fieldVal =  scn.next();
-                fieldVal = fieldVal.replaceAll("\r", "");
-                setData(currField, fieldVal, d);
-            }
-            scn.close();
-            return d;
-        } catch (FileNotFoundException e) {
-            throw new IllegalArgumentException("Given file path does not exist.");
+        if (pathToData == null) return null;
+        HashMap<String, String> data = ObjectDataParser.parseObjectData(pathToData);
+        Dialogue d = new Dialogue();
+        for (String field : data.keySet()) {
+            setData(field, data.get(field), d);
         }
+        return d;
     }
 
     private static void setData(String field, String val, Dialogue d)  {

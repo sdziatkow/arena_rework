@@ -1,8 +1,10 @@
-package control.objectGen;
+package control.objectGen.gameEntities;
 
 import charData.attr.Attr;
 import charData.stat.Stat;
 import charData.statMods.StatChange;
+import control.objectGen.ObjectDataParser;
+import control.objectGen.ObjectType;
 import itemData.DmgType;
 import itemData.Item;
 import itemData.armors.Armor;
@@ -10,8 +12,6 @@ import itemData.usables.Usable;
 import itemData.weapons.Weapon;
 import values.ValType;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Scanner;
 
