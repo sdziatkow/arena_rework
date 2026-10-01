@@ -9,7 +9,7 @@ import menus.Menus;
 import spriteData.AnimSprite;
 import spriteData.FrameGen;
 import spriteData.behavior.boxes.Interactable;
-import worldData.WorldData;
+import worldState.WorldState;
 import static collision.ColType.WORLDBOX;
 import static collision.ColType.INTERACTBOX;
 
@@ -59,7 +59,7 @@ public class StorageSprite extends AnimSprite implements Interactable {
             isOpen = !isOpen;
         }
         if (isOpen) {
-            WorldData.openStorageInteraction(interactorID, getID());
+            WorldState.openStorageInteraction(interactorID, getID());
         } else Menus.clearMenus();
 
     }

@@ -9,7 +9,7 @@ import spriteData.Dir;
 import spriteData.FourWaySprite;
 import spriteData.behavior.combat.Combatant;
 import spriteData.weaponSprite.WeaponSprite;
-import worldData.WorldData;
+import worldState.WorldState;
 
 import static collision.ColType.HITBOX;
 import static collision.ColType.WORLDBOX;
@@ -63,7 +63,7 @@ public class CombatSprite extends CharSprite implements Combatant {
         EventHandler<ActionEvent> onAnimFrameFinish = new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
                 wpSprite.nextFrame();
-                WorldData.triggerAttk(getID(), wpSprite.getID());
+                WorldState.triggerAttk(getID(), wpSprite.getID());
             }
         };
 

@@ -10,7 +10,7 @@ import spriteData.Dir;
 import spriteData.charSprite.CharSprite;
 import spriteData.charSprite.CombatSprite;
 import values.IntVal;
-import worldData.WorldData;
+import worldState.WorldState;
 import control.runtimeTrackers.spriteData.BoxTracker;
 
 import java.util.Random;
@@ -83,10 +83,10 @@ public class NPCMvmnt {
     }
     private boolean canMove() {
         Stack<Integer> collidingWith = getCollidingWith();
-        return collidingWith.isEmpty() && WorldData.isInWorldBounds(sprite.getID());
+        return collidingWith.isEmpty() && WorldState.isInWorldBounds(sprite.getID());
     }
     private boolean canMove(Stack<Integer> collidingWith) {
-        return collidingWith.isEmpty() && WorldData.isInWorldBounds(sprite.getID());
+        return collidingWith.isEmpty() && WorldState.isInWorldBounds(sprite.getID());
     }
 
     private Stack<Integer> getDetectedHurtBoxes() {

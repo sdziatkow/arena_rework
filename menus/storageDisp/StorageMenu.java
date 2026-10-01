@@ -20,11 +20,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import spriteData.FrameGen;
 import storageData.Storage;
-import worldData.WorldData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Objects;
 
 public class StorageMenu {
@@ -36,6 +34,9 @@ public class StorageMenu {
     private Storage stg;
     private Integer selectedItemID;
     HashMap<Integer, Integer> itemIDs;
+
+    /** Must-have for equip functionality. */
+    private Integer gcID;
 
 //LISTENERS--------------------------------------------------------------------------------------------------------------
 
@@ -66,7 +67,11 @@ public class StorageMenu {
 
 //CONSTRUCTOR------------------------------------------------------------------------------------------------------------
 
-    public StorageMenu(Storage s, boolean useEQBtn) {
+    /**
+     * Make a menu displaying the given Storage.
+     * @param s The Storage Object whose Item Objects will be displayed.
+     */
+    public StorageMenu(Storage s) {
         itemIDs = new HashMap<>();
         stg = s;
         main = new GridPane();
@@ -76,45 +81,31 @@ public class StorageMenu {
         itemBtns = new ArrayList<Button>();
         itemDisp.setHgap(4.0);
         setUpTypeList();
-        if (useEQBtn) {
-            Button eqBtn = new Button();
-            eqBtn.setId("eq");
-            EventHandler<ActionEvent> onEq = new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent actionEvent) {
-                    String src = ((Button) actionEvent.getSource()).getText();
-                    if (src.equals(EQAction.dispInfo(EQAction.EQUIP))) {
-                        EquipHandler.handleEquip(
-                            stg.getID(),
-                            stg.grabItem(selectedItemID).getID(),
-                            WorldLocation.STORAGE,
-                            EQAction.EQUIP
-                        );
-                        ((Button) actionEvent.getSource()).setText(EQAction.dispInfo(EQAction.UN_EQUIP));
-                    }
-                    else if (src.equals(EQAction.dispInfo(EQAction.UN_EQUIP))) {
-                        EquipHandler.handleEquip(
-                            stg.getID(),
-                            stg.grabItem(selectedItemID).getID(),
-                            WorldLocation.STORAGE,
-                            EQAction.UN_EQUIP
-                        );
-                        ((Button) actionEvent.getSource()).setText(EQAction.dispInfo(EQAction.EQUIP));
-                    }
-                }
-            };
-            eqBtn.setOnAction(onEq);
-            addBtnToItemDisp(eqBtn);
-        }
         typeList.getSelectionModel().select(0);
     }
 
+    /** Full Reload
+     * <br>Resets the storage menu.
+     * <br>Selects the previously selected ItemType (default is ALL) to display a list of Item names.
+     */
     public void reset() {
         itemIDs.clear();
         main.getChildren().clear();
         setUpTypeList();
         typeList.getSelectionModel().select(typeList.getSelectionModel().getSelectedIndex());
+    }
 
+    /** Full Reload
+     * <br>Resets the storage menu.
+     * <br>Selects the previously selected ItemType (default is ALL) to display a list of item names.
+     * <br>Selects the previously selected Item if it is still there.
+     */
+    public void resetAndKeepItemDisp() {
+        int lastIdx = itemList.getSelectionModel().getSelectedIndex();
+        reset();
+        if (itemIDs.containsKey(lastIdx)) {
+            itemList.getSelectionModel().select(lastIdx);
+        }
     }
 
 //ITEM-TYPE-LIST-VIEW----------------------------------------------------------------------------------------------------
@@ -190,5 +181,34 @@ public class StorageMenu {
 
     public void addBtnToItemDisp(Button btn) {
         itemBtns.add(btn);
+    }
+
+//OPTIONAL-BUTTONS-------------------------------------------------------------------------------------------------------
+
+    /**
+     * Adds an Equip Button to the individual item display.
+     * @param gameCharID The GameChar Object in which the Equip Button will act on.
+     */
+    public void addEQBtn(Integer gameCharID) {
+        Button eqBtn = new Button();
+        eqBtn.setId("eq");
+        EventHandler<ActionEvent> onEq = new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                Item i = stg.grabItem(selectedItemID);
+                EQAction eqActn = EQAction.EQUIP;
+                if (i.isEquipped()) eqActn = EQAction.UN_EQUIP;
+                String nextBtnTxt = EQAction.dispInfo(EQAction.oppositeOf(eqActn));
+                EquipHandler.handleEquip(
+                        gameCharID,
+                        selectedItemID,
+                        WorldLocation.STORAGE,
+                        eqActn
+                );
+                ((Button) actionEvent.getSource()).setText(nextBtnTxt);
+            }
+        };
+        eqBtn.setOnAction(onEq);
+        addBtnToItemDisp(eqBtn);
     }
 }

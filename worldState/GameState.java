@@ -1,4 +1,4 @@
-package worldData;
+package worldState;
 
 public enum GameState {
     RUNNING,

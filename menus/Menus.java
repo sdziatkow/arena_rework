@@ -1,12 +1,9 @@
 package menus;
 
 import charData.GameChar;
-import charData.Level;
-import charData.attr.CharAttr;
 import charData.stat.CharStats;
 import control.handlers.StorageHandler;
-import control.runtimeTrackers.worldData.StorageTracker;
-import itemData.Item;
+import control.runtimeTrackers.WorldTracker;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -29,6 +26,9 @@ import menus.statBar.StatBarDisp;
 import menus.storageDisp.StorageMenu;
 import storageData.Storage;
 
+import static control.runtimeTrackers.WorldEntity.GAME_CHAR;
+import static control.runtimeTrackers.WorldEntity.STORAGE;
+
 public class Menus {
     private static final GridPane menuSpace = new GridPane();
     private static final FlowPane screenSpace = new FlowPane(menuSpace);
@@ -39,10 +39,17 @@ public class Menus {
 
 //GAME-CHARACTER---------------------------------------------------------------------------------------------------------
 
-    private static class MenuPicker {
+    public static void dispGameChar(Integer gameCharID) {
+        if (isMenuShowing()) clearMenus();
+        GameChar g = (GameChar)WorldTracker.get(GAME_CHAR, gameCharID);
+        if (g == null) throw new IllegalArgumentException("ERROR: CAN NOT DISPLY MENU - Given gameCharID is null.");
+        menuSpace.add(new GameCharMenu(g).typeSelector, menuSpace.getColumnCount(), menuSpace.getRowCount());
+    }
+
+    /** Overall ListView of which GameChar sub-menus can be displayed. */
+    private static class GameCharMenu {
         private final ListView<String> typeSelector;
         private final GameChar gameChar;
-        private final Storage backpack;
         private final ChangeListener<String> onTypeSelected = new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observableValue, String prev, String selected) {
@@ -53,20 +60,11 @@ public class Menus {
                 }
                 if (!menuSpace.getChildren().isEmpty()) clearMenus();
                 switch (MenuType.valueOf(selected)) {
-                    case CHARACTER:
-                        dispChar(gameChar);
-                        break;
-                    case STATS:
-                        dispStats(gameChar.stats());
-                        break;
-                    case ATTRIBUTES:
-                        dispAttr(gameChar);
-                        break;
-                    case BACKPACK:
-                        dispStorage(backpack);
-                        break;
-                    case EQUIPPED:
-                        break;
+                    case CHARACTER: dispChar(gameChar); break;
+                    case STATS: dispStats(gameChar.stats()); break;
+                    case ATTRIBUTES: dispAttr(gameChar); break;
+                    case BACKPACK: dispStorage(gameChar.getID(), (Storage)WorldTracker.get(STORAGE, gameChar.getStorageID())); break;
+                    case EQUIPPED: break;
                     default: break;
                 }
             }
@@ -80,21 +78,16 @@ public class Menus {
             all.add("EXIT");
             return all;
         }
-        private MenuPicker(GameChar g, Storage b) {
+        private GameCharMenu(GameChar g) {
             typeSelector = new ListView<>(menuTypes());
             typeSelector.getSelectionModel().selectedItemProperty().addListener(onTypeSelected);
             gameChar = g;
-            backpack = b;
         }
     }
 
-    public static void dispPicker(GameChar g, Storage s) {
-        if (isMenuShowing()) clearMenus();
-        menuSpace.add(new MenuPicker(g, s).typeSelector, menuSpace.getColumnCount(), menuSpace.getRowCount());
-    }
-
-    public static void dispStorage(Storage s) {
-        StorageMenu menu = new StorageMenu(s, true);
+    private static void dispStorage(int gameCharID, Storage s) {
+        StorageMenu menu = new StorageMenu(s);
+        menu.addEQBtn(gameCharID);
         menuSpace.add(menu.main, menuSpace.getColumnCount(), menuSpace.getRowCount());
     }
 
@@ -117,8 +110,8 @@ public class Menus {
 
     public static void dispStorageInteraction(Storage interactor, Storage interactable) {
         if (isMenuShowing()) clearMenus();
-        StorageMenu m1 = new StorageMenu(interactor, false);
-        StorageMenu m2 = new StorageMenu(interactable, false);
+        StorageMenu interactorMenu = new StorageMenu(interactor);
+        StorageMenu interactableMenu = new StorageMenu(interactable);
         Button put = new Button("Put");
         Button take = new Button("Take");
         put.setId("interaction");
@@ -127,32 +120,23 @@ public class Menus {
             @Override
             public void handle(ActionEvent actionEvent) {
                 Button src = (Button)actionEvent.getSource();
-                Storage fromStg = interactor;
                 Storage toStg = interactable;
-                StorageMenu m = m1;
-                if (src.getText().equals("Put")) {
-                    fromStg = interactor;
-                    toStg = interactable;
-                    m = m1;
-                }
-                else if (src.getText().equals("Take")) {
-                    fromStg = interactable;
+                StorageMenu menuWithItem = interactorMenu;
+                if (src.getText().equals("Take")) {
                     toStg = interactor;
-                    m = m2;
+                    menuWithItem = interactableMenu;
                 }
-                Item i = fromStg.grabItem(m.selectedItem());
-                StorageHandler.addTo(toStg.getID(), i.getID(), fromStg.getAmntStored(i.getID()));
-                i.setStorageID(toStg.getID());
-                m1.reset();
-                m2.reset();
+                StorageHandler.addTo(toStg.getID(), menuWithItem.selectedItem(), 1);
+                interactorMenu.resetAndKeepItemDisp();
+                interactableMenu.resetAndKeepItemDisp();
             }
         };
         put.setOnAction(onMove);
         take.setOnAction(onMove);
-        m1.addBtnToItemDisp(put);
-        m2.addBtnToItemDisp(take);
-        menuSpace.add(m1.main, 0, 0);
-        menuSpace.add(m2.main, 0, 1);
+        interactorMenu.addBtnToItemDisp(put);
+        interactableMenu.addBtnToItemDisp(take);
+        menuSpace.add(interactorMenu.main, 0, 0);
+        menuSpace.add(interactableMenu.main, 0, 1);
     }
 
 //STAT-BARS--------------------------------------------------------------------------------------------------------------

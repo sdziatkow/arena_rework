@@ -29,6 +29,7 @@ public class TileSet {
         container = new Group();
         floor = new Region();
         border = new GridPane();
+        worldBox = new CollisionBox();
     }
 
     public TileSet(String pathToFloorImg, String pathToBorderImg, int[] DIMENSIONS, double offset) {
@@ -40,6 +41,7 @@ public class TileSet {
         pathToFloor = pathToFloorImg;
         pathToBorder = pathToBorderImg;
         borderOffset = offset;
+        worldBox = new CollisionBox();
     }
 
     private void setUpFloor() {

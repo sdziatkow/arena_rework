@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class SpriteTracker {
-
-    public static int playerID;
     public static Map<Integer, Sprite> allSprites = new HashMap<>();
 
     //BG-SPRITES.

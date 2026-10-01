@@ -30,18 +30,6 @@ public class GameChar extends CharData {
         gold.setMax(1000000000);
     }
 
-    public GameChar(String pathToMvSheet, String pathToAttkSheet, String name, CharClass c) {
-        super(pathToMvSheet, pathToAttkSheet, name);
-        attr = new CharAttr();
-        stats = new CharStats();
-        lvl = new Level();
-        charClass = c;
-        setInitialAttrValues();
-
-        gold = new IntVal();
-        gold.setMax(1000000000);
-    }
-
     public void setCharClass(CharClass c) {charClass = c;}
 
     public CharAttr attr() {

@@ -1,29 +1,20 @@
-package tileSet;
+package control.objectGen.gameObjects;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
+import control.objectGen.ObjectDataParser;
+import tileSet.TileSet;
+
+import java.util.HashMap;
 
 public class TileSetMaker {
 
     public static TileSet makeTileSet(String pathToData) {
-        try { // Get the file set up.
-            FileInputStream inFile = new FileInputStream(pathToData);
-            Scanner scn = new Scanner(inFile);
-            scn.useDelimiter("[|]|\\n");
-            TileSet t = new TileSet();
-            while (scn.hasNext()) {
-                String currField = scn.next();
-                String fieldVal =  scn.next();
-                fieldVal = fieldVal.replaceAll("\r", "");
-                setData(currField, fieldVal, t);
-            }
-            scn.close();
-            t.setUp();
-            return t;
-        } catch (FileNotFoundException e) {
-            throw new IllegalArgumentException("Given file path does not exist.");
+        HashMap<String, String> data = ObjectDataParser.parseObjectData(pathToData);
+        TileSet t = new TileSet();
+        for (String field : data.keySet()) {
+            setData(field, data.get(field), t);
         }
+        t.setUp();
+        return t;
     }
 
     private static void setData(String field, String val, TileSet t)  {

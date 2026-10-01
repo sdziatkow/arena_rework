@@ -1,6 +1,8 @@
 package control.handlers;
 
+import charData.GameChar;
 import control.WorldLocation;
+import control.runtimeTrackers.WorldTracker;
 import itemData.Item;
 import itemData.usables.Usable;
 import itemData.weapons.Weapon;
@@ -8,9 +10,9 @@ import spriteData.charSprite.CombatSprite;
 import spriteData.weaponSprite.WeaponSprite;
 import storageData.EQSlots;
 import control.runtimeTrackers.spriteData.SpriteTracker;
-import control.runtimeTrackers.worldData.StorageTracker;
 import storageData.Storage;
-import values.ValType;
+
+import static control.runtimeTrackers.WorldEntity.*;
 
 /**
  * Handles all of the following during run-time:
@@ -20,15 +22,21 @@ import values.ValType;
  */
 public class EquipHandler {
 
-    public static void handleEquip(Integer storageID, Integer itemID, WorldLocation from, EQAction actn) {
-        Item item = StorageTracker.items.get(itemID);
+    public static void handleEquip(
+        Integer gameCharID,
+        Integer itemID,
+        WorldLocation from,
+        EQAction actn)
+    {
+        Item item = (Item)WorldTracker.get(ITEM, itemID);
         if (item == null) return;
         switch (from) {
             case OVERWORLD: // no implementation for equipping from overworld.
                 break;
             case STORAGE:
+                Integer storageID = ((GameChar)WorldTracker.get(GAME_CHAR, gameCharID)).getStorageID();
                 if (storageID == null) return;
-                EQSlots eqSlots = StorageTracker.eqSlots.get(storageID);
+                EQSlots eqSlots = (EQSlots)WorldTracker.get(EQ_SLOTS, gameCharID);
                 if (eqSlots == null) return;
                 if (item.getStorageID().equals(storageID)) handleItemFromOwnStorage(item, eqSlots, actn);
                 break;
@@ -37,18 +45,17 @@ public class EquipHandler {
         }
     }
 
-    public static void handleUse(Integer storageID, Integer itemID) {
-        Usable item = (Usable)StorageTracker.items.get(itemID);
+    public static void handleUse(Integer gameCharID, Integer storageID, Integer itemID) {
+        Usable item = (Usable)WorldTracker.get(ITEM, itemID);
         if (item == null) return;
-        Storage stg = StorageTracker.storages.get(storageID);
-        EQSlots eqSlots = StorageTracker.eqSlots.get(storageID);
+        Storage stg = (Storage)WorldTracker.get(STORAGE, storageID);
+        EQSlots eqSlots = (EQSlots)WorldTracker.get(EQ_SLOTS, gameCharID);
         if (stg == null || eqSlots == null) return;
         if (storageID.equals(item.getStorageID())) {
             useEquippedUsable(item, eqSlots, stg);
         }
 
     }
-
 
 //EQUIPPING--------------------------------------------------------------------------------------------------------------
 
@@ -97,8 +104,8 @@ public class EquipHandler {
         StatChangeHandler.applyStatMod(eqSlots.getID(), item.statMod());
         StorageHandler.removeFrom(stg.getID(), item.getID(), 1);
         if (!stg.hasItem(item.getID())) { // If item was removed from storage.
-            handleEquip(stg.getID(), item.getID(), WorldLocation.STORAGE, EQAction.UN_EQUIP);
-            StorageTracker.items.remove(item.getID());
+            handleItemFromOwnStorage(item, eqSlots, EQAction.UN_EQUIP);
+            WorldTracker.remove(ITEM, item.getID());
         }
     }
 }

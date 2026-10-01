@@ -12,18 +12,37 @@ import java.util.HashMap;
  */
 public class Storage extends ArenaObject {
     private HashMap<ItemType, HashMap<Integer, StoredItem>> items;
+    private HashMap<String, Integer> objIDs;
+    private String pathToAnimSprite;
 
     public Storage() {
         items = new HashMap<>();
         for (ItemType t : ItemType.getTypes()) {
             items.put(t, new HashMap<>());
         }
+        objIDs = new HashMap<>();
     }
 
+//SETTERS----------------------------------------------------------------------------------------------------------------
+
+    public void setPathToAnimSprite(String path) {pathToAnimSprite = path;}
+
+//GETTERS----------------------------------------------------------------------------------------------------------------
+
+    public String getPathToAnimSprite(){return pathToAnimSprite;}
+
+    /**
+     * @param itemID The ID of the item whose amount stored will be returned.
+     * @return The amount of the item that is stored.
+     */
     public int getAmntStored(Integer itemID) {
         return items.get(ItemType.ALL).get(itemID).amnt().get();
     }
 
+    /**
+     * @param t The type of items to return.
+     * @return An Array-copy of all items of the given type.
+     */
     public Item[] getItems(ItemType t) {
         StoredItem[] stored = items.get(t).values().toArray(new StoredItem[0]);
         return Arrays.stream(stored).map(StoredItem::item).toArray(Item[]::new);
@@ -36,15 +55,20 @@ public class Storage extends ArenaObject {
      * If Item is already being stored, add to its amnt by given amnt.
      * @param i The item to add to this Storage.
      * @param amnt The amount to add.
+     * @return True if given Item Object is NEWLY added to this storage. False if it already existed.
      */
-    public void store(Item i, int amnt) {
-        if (hasItem(i.getID())) {
-            items.get(ItemType.typeOf(i)).get(i.getID()).amnt().inc(amnt);
+    public boolean store(Item i, int amnt) {
+        StoredItem toStore = grabStoredSameAs(i.getObjID());
+        if (toStore != null) {
+            toStore.amnt().inc(amnt);
+            return false;
         }
         else{
-            StoredItem toStore = new StoredItem(i, amnt);
+            toStore = new StoredItem(i, amnt);
             items.get(ItemType.typeOf(i)).put(i.getID(), toStore);
             items.get(ItemType.ALL).put(i.getID(), toStore);
+            objIDs.put(toStore.item().getObjID(), toStore.item().getID());
+            return true;
         }
     }
 
@@ -75,12 +99,14 @@ public class Storage extends ArenaObject {
         StoredItem removing = items.get(ItemType.ALL).get(itemID);
         items.get(ItemType.typeOf(removing.item())).remove(itemID);
         items.get(ItemType.ALL).remove(itemID);
+        objIDs.remove(removing.item().getObjID());
     }
 
     /** @return StoredItem Object whose Item field has the given itemID */
     private StoredItem grabStoredItem(Integer itemID) {
         return items.get(ItemType.ALL).get(itemID);
     }
+    private StoredItem grabStoredSameAs(String objID) {return items.get(ItemType.ALL).get(objIDs.get(objID));}
 
     /**
      * @param itemID The ID of the Item Object that should be returned.
@@ -89,6 +115,15 @@ public class Storage extends ArenaObject {
     public Item grabItem(Integer itemID) {
         if (!hasItem(itemID)) return null;
         return grabStoredItem(itemID).item();
+    }
+
+    /**
+     * @param objID The ID of the Item Object that should be returned.
+     * @return The Item Object with given objID.
+     */
+    public Item grabSameAs(String objID) {
+        if (!hasSameAs(objID)) return null;
+        return grabStoredSameAs(objID).item();
     }
 
 //FLAGS------------------------------------------------------------------------------------------------------------------
@@ -105,4 +140,5 @@ public class Storage extends ArenaObject {
     public boolean hasItem(Integer itemID) {
         return grabStoredItem(itemID) != null;
     }
+    public boolean hasSameAs(String objID) {return grabStoredSameAs(objID) != null;}
 }
