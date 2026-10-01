@@ -12,6 +12,8 @@ import spriteData.charSprite.CombatSprite;
 import values.ValType;
 
 import static control.runtimeTrackers.WorldEntity.GAME_CHAR;
+import static control.runtimeTrackers.spriteData.SpriteType.COMBATANT;
+import static control.runtimeTrackers.spriteData.SpriteType.MOVABLE;
 
 /**
  * Handles all of the following during run-time:
@@ -34,9 +36,14 @@ public class StatChangeHandler {
 
     //TODO: needs more testing for how much it effects it. (if it affects it at all)
     public static void updateAttkSpeed(int gameCharID) {
+        try { // Can not update if not a combatant.
+            if (!SpriteTracker.getAllIDs(COMBATANT).contains(gameCharID)) return;
+        }
+        catch (IllegalArgumentException e) {return;} // Will catch error if no Combatants exists in the world yet.
+
         GameChar g = (GameChar)WorldTracker.get(GAME_CHAR, gameCharID);
         double gSpeed = g.stats().get(Stat.SPEED, ValType.VAL);
-        CombatSprite sprite = SpriteTracker.combatSprites.get(gameCharID);
+        CombatSprite sprite = (CombatSprite)SpriteTracker.get(COMBATANT, gameCharID);
         if (sprite == null) return;
         double attkSpeed = ((gSpeed * 1.5) / (100.0 + (gSpeed / 2.0)));
         sprite.setAttkSpeed(attkSpeed);
@@ -46,7 +53,7 @@ public class StatChangeHandler {
     public static void updateMoveSpeed(int gameCharID) {
         GameChar g = (GameChar)WorldTracker.get(GAME_CHAR, gameCharID);
         double gSpeed = g.stats().get(Stat.SPEED, ValType.VAL);
-        Movable sprite = SpriteTracker.movables.get(gameCharID);
+        Movable sprite = (Movable)SpriteTracker.get(MOVABLE, gameCharID);
         if (sprite == null) return;
         double mvSpeed = 0.5 + (gSpeed / (100.0 + (gSpeed / 8)));
         sprite.setMaxSpeed(mvSpeed);

@@ -10,6 +10,7 @@ import control.handlers.EquipHandler;
 import control.handlers.StorageHandler;
 import control.objectGen.gameEntities.GameCharGen;
 import control.runtimeTrackers.WorldTracker;
+import control.runtimeTrackers.spriteData.SpriteType;
 import dialogue.Dialogue;
 import javafx.scene.ParallelCamera;
 import javafx.scene.Scene;
@@ -22,8 +23,12 @@ import movement.npcMvmnt.NPCMvmnt;
 import control.runtimeTrackers.spriteData.BoxTracker;
 import control.runtimeTrackers.spriteData.MvmntTracker;
 import control.runtimeTrackers.spriteData.SpriteTracker;
+import spriteData.Sprite;
+import spriteData.behavior.boxes.Hurtable;
+import spriteData.behavior.boxes.Interactable;
 import spriteData.charSprite.CharSprite;
 import control.objectGen.WorldMaker;
+import spriteData.charSprite.CombatSprite;
 import storageData.EQSlots;
 import storageData.Storage;
 
@@ -32,6 +37,7 @@ import java.util.Stack;
 
 import static collision.ColType.*;
 import static control.runtimeTrackers.WorldEntity.*;
+import static control.runtimeTrackers.spriteData.SpriteType.*;
 import static worldState.GameState.RUNNING;
 
 /**
@@ -72,17 +78,17 @@ public class WorldState {
                 false,
                 false
         );
-        SpriteTracker.combatSprites.get(playerID).setNPCState(null);
-        PlayerMvmnt.setSprite(SpriteTracker.combatSprites.get(playerID));
+        PlayerMvmnt.setSprite((CombatSprite)SpriteTracker.get(COMBATANT, playerID));
         PlayerMvmnt.cntrlSetUp();
     }
 
     private static void setUpStatBars() {
-        SpriteTracker.charSprites.forEach((Integer id, CharSprite sprite) -> {
+        WorldTracker.getAllIDs(GAME_CHAR).forEach((Integer id) -> {
             GameChar g = (GameChar)WorldTracker.get(GAME_CHAR, id);
+            CharSprite s = (CharSprite)SpriteTracker.get(MOVABLE, id);
             if (!id.equals(playerID)) {
                 StatBar bar = new StatBar(Stat.HP, g.stats().progressVal(Stat.HP));
-                sprite.setStatBar(bar);
+                s.setStatBar(bar);
             }
             else {
                 Menus.addOverlayStatBars(
@@ -92,7 +98,7 @@ public class WorldState {
                         g.lvl().getProgressVal()
                 );
             }
-        });
+    });
     }
 
     private static void setUpScene() {
@@ -107,7 +113,7 @@ public class WorldState {
         Menus.overlay.setCache(true);
         Menus.overlay.getChildren().add(cam);
         world.getBG().getChildren().add(Menus.overlay);
-        CharMvmnt.bindNode(SpriteTracker.charSprites.get(playerID), Menus.overlay);
+        CharMvmnt.bindNode((CharSprite)SpriteTracker.get(MOVABLE, playerID), Menus.overlay);
     }
 
 //STATE------------------------------------------------------------------------------------------------------------------
@@ -165,7 +171,7 @@ public class WorldState {
         );
         if (!hitting.isEmpty()) {
             for (Integer id : hitting) {
-                SpriteTracker.hurtables.get(id).onHurt(cmbtSprite);
+                ((Hurtable)SpriteTracker.get(HURTABLE, id)).onHurt(cmbtSprite);
             }
         }
     }
@@ -175,13 +181,13 @@ public class WorldState {
             BoxTracker.getBox(CHECKBOX, interactor), BoxTracker.getBoxes(INTERACTBOX)
         );
         while (!interactingWith.isEmpty()) {
-            SpriteTracker.interactables.get(interactingWith.pop()).onInteract(interactor);
+            ((Interactable)SpriteTracker.get(INTERACTABLE, interactingWith.pop())).onInteract(interactor);
         }
     }
 
-    public static void removeSprite(int spriteID) {
-        world.getBG().getChildren().remove(SpriteTracker.allSprites.get(spriteID).getGroup());
-        SpriteTracker.removeSprite(SpriteTracker.allSprites.get(spriteID));
+    public static void removeSprite(SpriteType type, int spriteID) {
+        world.getBG().getChildren().remove(SpriteTracker.get(type, spriteID).getGroup());
+        SpriteTracker.remove(type, spriteID);
     }
 
 //STORAGE----------------------------------------------------------------------------------------------------------------
@@ -197,7 +203,7 @@ public class WorldState {
             toStorageID = ((GameChar)WorldTracker.get(GAME_CHAR, toStorageID)).getStorageID();
         }
         StorageHandler.addTo(toStorageID, itemID, 1);
-        removeSprite(itemID);
+        removeSprite(INTERACTABLE, itemID);
     }
 
 //MENUS------------------------------------------------------------------------------------------------------------------

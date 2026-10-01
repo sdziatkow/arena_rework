@@ -13,14 +13,14 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import menus.Menus;
+import spriteData.behavior.boxes.Movable;
 import worldState.WorldState;
 import control.runtimeTrackers.spriteData.SpriteTracker;
-
-import java.util.HashSet;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import static control.runtimeTrackers.WorldEntity.GAME_CHAR;
+import static control.runtimeTrackers.spriteData.SpriteType.MOVABLE;
 
 public class Main extends Application {
 
@@ -71,7 +71,7 @@ public class Main extends Application {
         s.show();
 
     //TESTING------------------------------------------------------------------------------------------------------------
-        SpriteTracker.charSprites.get(WorldState.playerID).setMaxSpeed(1.5);
+        ((Movable)SpriteTracker.get(MOVABLE, WorldState.playerID)).setMaxSpeed(1.5);
         ((GameChar)WorldTracker.get(GAME_CHAR, WorldState.playerID)).lvl().incAttrPoints(100);
         ((GameChar)WorldTracker.get(GAME_CHAR, WorldState.playerID)).attr().skillUp(Attr.AGILITY, 100);
         StatChangeHandler.updateStatsFromAttr(WorldState.playerID);

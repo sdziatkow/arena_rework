@@ -13,6 +13,7 @@ import control.runtimeTrackers.spriteData.SpriteTracker;
 import storageData.Storage;
 
 import static control.runtimeTrackers.WorldEntity.*;
+import static control.runtimeTrackers.spriteData.SpriteType.COMBATANT;
 
 /**
  * Handles all of the following during run-time:
@@ -35,9 +36,7 @@ public class EquipHandler {
                 break;
             case STORAGE:
                 Integer storageID = ((GameChar)WorldTracker.get(GAME_CHAR, gameCharID)).getStorageID();
-                if (storageID == null) return;
                 EQSlots eqSlots = (EQSlots)WorldTracker.get(EQ_SLOTS, gameCharID);
-                if (eqSlots == null) return;
                 if (item.getStorageID().equals(storageID)) handleItemFromOwnStorage(item, eqSlots, actn);
                 break;
             default:
@@ -47,14 +46,11 @@ public class EquipHandler {
 
     public static void handleUse(Integer gameCharID, Integer storageID, Integer itemID) {
         Usable item = (Usable)WorldTracker.get(ITEM, itemID);
-        if (item == null) return;
         Storage stg = (Storage)WorldTracker.get(STORAGE, storageID);
         EQSlots eqSlots = (EQSlots)WorldTracker.get(EQ_SLOTS, gameCharID);
-        if (stg == null || eqSlots == null) return;
         if (storageID.equals(item.getStorageID())) {
             useEquippedUsable(item, eqSlots, stg);
         }
-
     }
 
 //EQUIPPING--------------------------------------------------------------------------------------------------------------
@@ -87,8 +83,7 @@ public class EquipHandler {
         if (item instanceof Weapon) {
 
             // Get CombatSprite Object related to given eqSlots.
-            CombatSprite sprite = SpriteTracker.combatSprites.get(eqSlots.getID());
-            if (sprite == null) return;
+            CombatSprite sprite = (CombatSprite)SpriteTracker.get(COMBATANT, eqSlots.getID());
 
             // If it exists, set its WeaponSprite Object to the Weapon Object's WeaponSprite; clear it if un-equipping.
             if (eqChangeStatus) {

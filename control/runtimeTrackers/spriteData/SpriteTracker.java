@@ -1,93 +1,73 @@
 package control.runtimeTrackers.spriteData;
 
 import spriteData.Sprite;
-import spriteData.backgroundSprite.PickableSprite;
 import spriteData.backgroundSprite.StaticSprite;
 import spriteData.behavior.boxes.*;
-import spriteData.charSprite.CharSprite;
-import spriteData.charSprite.CombatSprite;
+import spriteData.behavior.combat.Combatant;
 import spriteData.weaponSprite.WeaponSprite;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
+import static control.runtimeTrackers.spriteData.SpriteType.*;
 
 public abstract class SpriteTracker {
-    public static Map<Integer, Sprite> allSprites = new HashMap<>();
+    public static Map<SpriteType, HashMap<Integer, Sprite>> all = new HashMap<>();
 
-    //BG-SPRITES.
-    public static Map<Integer, StaticSprite> staticSprites = new HashMap<>();
-    public static Map<Integer, PickableSprite> pickables = new HashMap<>();
+    public static void add(Sprite sprite) {
+        if (sprite == null || sprite.getID() == null) return;
+        ArrayList<SpriteType> types = new ArrayList<>();
+        if (sprite instanceof Hurtable) types.add(HURTABLE);
+        if (sprite instanceof Movable) types.add(MOVABLE);
+        if (sprite instanceof Interactable) types.add(INTERACTABLE);
+        if (sprite instanceof Combatant) types.add(COMBATANT);
 
-    // GAME-CHARS.
-    public static Map<Integer, CharSprite> charSprites = new HashMap<>();
-    public static Map<Integer, CombatSprite> combatSprites = new HashMap<>();
-    public static Map<Integer, WeaponSprite> weaponSprites = new HashMap<>();
-
-    // BEHAVIORS.
-    public static Map<Integer, Interactable> interactables = new HashMap<>();
-    public static Map<Integer, Hurtable> hurtables = new HashMap<>();
-    public static Map<Integer, Movable> movables = new HashMap<>();
-
-    public static void trackSprite(Sprite sprite) {
-        allSprites.putIfAbsent(sprite.getID(), sprite);
-        if (sprite instanceof CombatSprite c) {
-            trackSprite(c.getWPSprite());
-            combatSprites.put(c.getID(), c);
-        }
-        if (sprite instanceof CharSprite c) {
-            charSprites.put(c.getID(), c);
-        }
-        if (sprite instanceof WeaponSprite w) {
-            weaponSprites.put(w.getID(), w);
-        }
-        if (sprite instanceof StaticSprite s) {
-            staticSprites.put(s.getID(), s);
-        }
-        if (sprite instanceof PickableSprite p) {
-            pickables.put(p.getID(), p);
-        }
-
-        if (sprite instanceof Interactable i) {
-            interactables.put(sprite.getID(), i);
-        }
-        if (sprite instanceof Hurtable h) {
-            hurtables.put(sprite.getID(), h);
-        }
-        if (sprite instanceof Movable m) {
-            movables.put(sprite.getID(), m);
+        if (sprite instanceof StaticSprite) types.add(STATIC);
+        if (sprite instanceof WeaponSprite) types.add(WEAPON);
+        for (int t = 0; t < types.size(); ++t) {
+            all.putIfAbsent(types.get(t), new HashMap<>());
+            all.get(types.get(t)).put(sprite.getID(), sprite);
+            if (types.get(t).equals(COMBATANT)) add(((Combatant)sprite).getWPSprite());
         }
         BoxTracker.trackBoxes(sprite);
     }
 
-    public static void removeSprite(Sprite sprite) {
-        allSprites.remove(sprite.getID(), sprite);
-        if (sprite instanceof CombatSprite c) {
-            removeSprite(c.getWPSprite());
-            combatSprites.remove(c.getID(), c);
-        }
-        if (sprite instanceof CharSprite c) {
-            charSprites.remove(c.getID(), c);
-        }
-        if (sprite instanceof WeaponSprite w) {
-            weaponSprites.remove(w.getID(), w);
-        }
-        if (sprite instanceof StaticSprite s) {
-            staticSprites.remove(s.getID(), s);
-        }
-        if (sprite instanceof PickableSprite p) {
-            pickables.remove(p.getID(), p);
-        }
-
-        if (sprite instanceof Interactable i) {
-            interactables.remove(sprite.getID(), i);
-        }
-        if (sprite instanceof Hurtable h) {
-            hurtables.remove(sprite.getID(), h);
-        }
-        if (sprite instanceof Movable m) {
-            movables.remove(sprite.getID(), m);
-        }
+    public static void remove(SpriteType type, int arenaID) {
+        validateRetrieval(type, arenaID);
+        Sprite sprite = all.get(type).remove(arenaID);
         BoxTracker.removeBoxes(sprite);
     }
 
+    public static Sprite get(SpriteType type, int arenaID) {
+        validateRetrieval(type, arenaID);
+        return all.get(type).get(arenaID);
+    }
+
+    public static Set<Sprite> getAll(SpriteType type) {
+        validateRetrieval(type);
+        return new HashSet<>(all.get(type).values());
+    }
+
+    public static Set<Integer> getAllIDs(SpriteType type) throws IllegalArgumentException {
+        validateRetrieval(type);
+        return all.get(type).keySet();
+    }
+
+    private static void validateRetrieval(SpriteType type) {
+        if
+        (
+                type == null
+                        || all.get(type) == null
+        ) {
+            throw new IllegalArgumentException(
+                    "Attempting to access a Sprite that does not exist or was not properly added.");
+        }
+    }
+
+    private static void validateRetrieval(SpriteType type, int arenaID) {
+        validateRetrieval(type);
+        if (all.get(type).get(arenaID) == null) {
+            throw new IllegalArgumentException(
+                    "Attempting to access a Sprite that does not exist or was not properly added.");
+        }
+    }
 }
